@@ -1,0 +1,38 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.4'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
+}
+
+group = 'com.foilen'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudAzureVersion', "4.4.0")
+}
+
+dependencies {
+    implementation 'com.foilen:jl-smalltools-spring:2.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.azure.spring:spring-cloud-azure-starter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
