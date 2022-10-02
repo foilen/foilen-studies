@@ -1,0 +1,21 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          azure:
+            client-id: xxxxxxxxxxx
+            client-secret: xxxxxxxxxxx
+            client-name: Azure
+            client-authentication-method: basic
+            provider: azure-oauth-provider
+            scope: openid
+            redirect-uri: http://localhost:8080/login/oauth2/code/azure
+            authorization-grant-type: authorization_code
+        provider:
+          azure-oauth-provider:
+            authorization-uri: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+            user-info-uri: https://graph.microsoft.com/oidc/userinfo
+            token-uri: https://login.microsoftonline.com/common/oauth2/v2.0/token
+            jwk-set-uri: https://login.microsoftonline.com/common/discovery/v2.0/keys
+            user-name-attribute: sub

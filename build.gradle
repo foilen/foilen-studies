@@ -17,12 +17,18 @@ ext {
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-spring:2.1.0'
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'com.foilen:jl-smalltools-spring:2.1.1'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'com.azure.spring:spring-cloud-azure-starter'
+
+    // Database
+    // implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // Login
+    implementation 'com.azure.spring:spring-cloud-azure-starter-active-directory'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
