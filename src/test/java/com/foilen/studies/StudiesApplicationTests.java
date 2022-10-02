@@ -1,10 +1,10 @@
-package com.foilen.etudes;
+package com.foilen.studies;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EtudesApplicationTests {
+class StudiesApplicationTests {
 
     @Test
     void contextLoads() {

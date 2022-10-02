@@ -1,0 +1,51 @@
+{
+  "name": "ui",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@jagannathbhat/cra-build-watch": "^1.0.1"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.6",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^14.4.3",
+    "axios": "^0.27.2",
+    "bootstrap": "^5.2.1",
+    "bootstrap-icons": "^1.9.1",
+    "jquery": "^3.6.1",
+    "luxon": "^2.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.4.1",
+    "react-scripts": "^5.0.1",
+    "react-toastify": "^9.0.8",
+    "web-vitals": "^3.0.2"
+  },
+  "scripts": {
+    "start": "node node_modules/react-scripts/bin/react-scripts start",
+    "watch": "cra-build-watch --build-path ../../../build/resources/main/static",
+    "build": "node node_modules/react-scripts/bin/react-scripts build",
+    "test": "node node_modules/react-scripts/bin/react-scripts test",
+    "test:ci": "node node_modules/react-scripts/bin/react-scripts test --watchAll=false --passWithNoTests",
+    "eject": "node node_modules/react-scripts/bin/react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

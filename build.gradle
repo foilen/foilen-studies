@@ -2,6 +2,8 @@ plugins {
     id 'org.springframework.boot' version '2.7.4'
     id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
+
+    id 'com.github.node-gradle.node' version '3.4.0'
 }
 
 group = 'com.foilen'
@@ -17,16 +19,21 @@ ext {
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-spring:2.1.1'
+    implementation 'com.foilen:jl-smalltools-mongodb:2.2.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Database
-    // implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // Login
     implementation 'com.azure.spring:spring-cloud-azure-starter-active-directory'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // Text to speech
+    implementation platform('com.google.cloud:libraries-bom:26.1.2')
+    implementation 'com.google.cloud:google-cloud-texttospeech'
+    implementation 'com.google.auth:google-auth-library-oauth2-http'
 
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -39,6 +46,39 @@ dependencyManagement {
     }
 }
 
+springBoot {
+    mainClass = 'com.foilen.studies.StudiesApplication'
+}
+
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+// NodeJS
+node {
+    download = true
+    nodeProjectDir = file("${project.projectDir}/src/main/ui")
+}
+
+task copyNodeBuildFiles(type: Copy) {
+    from "${project.projectDir}/src/main/ui/build"
+    into "${project.projectDir}/build/resources/main/static"
+}
+
+// npmInstall -> npm_run_build -> copyNodeBuildFiles
+tasks.bootJar.dependsOn copyNodeBuildFiles
+tasks.assemble.dependsOn copyNodeBuildFiles
+tasks.copyNodeBuildFiles.dependsOn tasks.npm_run_build
+tasks.npm_run_build.dependsOn tasks.npmInstall
+
+// npm_run_test
+//task npmRunTest(type: NpmTask) {
+//    args = ['run', 'test:ci']
+//}
+//tasks.test.dependsOn tasks.npmRunTest
+//tasks.npmRunTest.dependsOn tasks.npmInstall
+
+// Start webui
+task npmRunWatch(type: NpmTask) {
+    args = ['run', 'watch']
 }

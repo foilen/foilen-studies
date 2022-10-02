@@ -19,3 +19,11 @@ spring:
             token-uri: https://login.microsoftonline.com/common/oauth2/v2.0/token
             jwk-set-uri: https://login.microsoftonline.com/common/discovery/v2.0/keys
             user-name-attribute: sub
+  data:
+    mongodb:
+      uri: mongodb+srv://xxxxxxxxxxx/?retryWrites=true&w=majority
+      database: xxxxxxxxxxx
+
+google:
+  tts:
+    userjson: /google-service-account.json

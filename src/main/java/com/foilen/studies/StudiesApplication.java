@@ -1,13 +1,13 @@
-package com.foilen.etudes;
+package com.foilen.studies;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EtudesApplication {
+public class StudiesApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EtudesApplication.class, args);
+        SpringApplication.run(StudiesApplication.class, args);
     }
 
 }
