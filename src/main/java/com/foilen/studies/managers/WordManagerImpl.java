@@ -10,9 +10,13 @@ import com.foilen.studies.data.vocabulary.WordList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 @Transactional
@@ -56,6 +60,22 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         wordList.setOwnerUserId(userId);
         wordList.setWordIds(wordByName.values().stream().map(Word::getId).collect(Collectors.toList()));
         wordListRepository.save(wordList);
+    }
+
+    @Override
+    public List<WordList> listWordList(String userId) {
+        return wordListRepository.findAllByOwnerUserIdOrderByName(userId);
+    }
+
+    @Override
+    public List<Word> listWord(String userId, String wordListId) {
+        var wordList = wordListRepository.findByIdAndOwnerUserId(wordListId, userId);
+        if (wordList == null) {
+            throw new ResponseStatusException(NOT_FOUND, "Word list does not exist");
+        }
+
+        return StreamSupport.stream(wordRepository.findAllById(wordList.getWordIds()).spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     private static final Set<Character> separators = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' '));

@@ -2,58 +2,89 @@ package com.foilen.studies.services;
 
 import com.foilen.smalltools.tools.AbstractBasics;
 import com.foilen.smalltools.tools.ResourceTools;
-import com.foilen.studies.data.SpeakTextCacheRepository;
+import com.foilen.studies.data.SpeakTextCacheFileRepository;
+import com.foilen.studies.data.WordRepository;
+import com.foilen.studies.data.vocabulary.Language;
+import com.foilen.studies.data.vocabulary.SpeakTextCacheFile;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.texttospeech.v1.*;
 import com.google.protobuf.ByteString;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.io.FileOutputStream;
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.io.OutputStream;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
 
     @Autowired
-    private SpeakTextCacheRepository speakTextCacheRepository;
+    private SpeakTextCacheFileRepository speakTextCacheFileRepository;
+    @Autowired
+    private WordRepository wordRepository;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
-        TextToSpeechSettings settings = TextToSpeechSettings.newBuilder()
-                .setCredentialsProvider(FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(ResourceTools.getResourceAsStream("/google-service-account.json"))))
+    @Value("${google.tts.userjson}")
+    private String userjson;
+
+    private TextToSpeechSettings settings;
+
+    @PostConstruct
+    public void init() throws IOException {
+        settings = TextToSpeechSettings.newBuilder()
+                .setCredentialsProvider(FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(ResourceTools.getResourceAsStream(userjson))))
                 .build();
-        try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
-            // Set the text input to be synthesized
-            SynthesisInput input = SynthesisInput.newBuilder().setText("Bonjour mon grand").build();
-
-            // Build the voice request, select the language code ("en-US") and the ssml voice gender
-            // ("neutral")
-            VoiceSelectionParams voice =
-                    VoiceSelectionParams.newBuilder()
-                            .setLanguageCode("fr-CA")
-                            .setSsmlGender(SsmlVoiceGender.NEUTRAL)
-                            .build();
-
-            // Select the type of audio file you want returned
-            AudioConfig audioConfig =
-                    AudioConfig.newBuilder().setAudioEncoding(AudioEncoding.MP3).build();
-
-            // Perform the text-to-speech request on the text input with the selected voice parameters and
-            // audio file type
-            SynthesizeSpeechResponse response =
-                    textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
-
-            // Get the audio contents from the response
-            ByteString audioContents = response.getAudioContent();
-
-            // Write the response to the output file.
-            try (OutputStream out = new FileOutputStream("output.mp3")) {
-                out.write(audioContents.toByteArray());
-                System.out.println("Audio content written to file \"output.mp3\"");
-            }
-        }
     }
 
+    @Override
+    public Resource getFile(String cacheId) {
+
+        // Find get the existing file
+        var speakTextCacheFile = speakTextCacheFileRepository.findByCacheId(cacheId);
+        if (speakTextCacheFile == null) {
+            // Find the text to generate
+            var word = wordRepository.findOneBySpeakTextCacheId(cacheId);
+            if (word == null) {
+                throw new ResponseStatusException(NOT_FOUND, "No Word with that speech id");
+            }
+
+            // Generate
+            var fileContent = generateFile(word.getSpeakText().getLanguage(), word.getSpeakText().getText());
+            speakTextCacheFile = new SpeakTextCacheFile();
+            speakTextCacheFile.setCacheId(cacheId);
+            speakTextCacheFile.setMp3Bytes(fileContent);
+            speakTextCacheFile = speakTextCacheFileRepository.save(speakTextCacheFile);
+        }
+
+        return new ByteArrayResource(speakTextCacheFile.getMp3Bytes());
+    }
+
+    private byte[] generateFile(Language language, String text) {
+        try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create(settings)) {
+            SynthesisInput input = SynthesisInput.newBuilder().setText(text).build();
+
+            String languageCode = switch (language) {
+                case EN -> "en-US";
+                case FR -> "fr-CA";
+            };
+
+            VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
+                    .setLanguageCode(languageCode)
+                    .setSsmlGender(SsmlVoiceGender.NEUTRAL)
+                    .build();
+            AudioConfig audioConfig = AudioConfig.newBuilder().setAudioEncoding(AudioEncoding.MP3).build();
+            SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
+            ByteString audioContents = response.getAudioContent();
+
+            return audioContents.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -22,4 +22,6 @@ public class ExceptionToApiErrorInterceptor extends AbstractBasics {
         return log(new ExceptionErrorResult(new ApiError(ex.getMessage())));
     }
 
+    // TODO Handle ResponseStatusException
+
 }
