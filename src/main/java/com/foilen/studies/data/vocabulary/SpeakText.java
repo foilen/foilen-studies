@@ -6,7 +6,7 @@ public class SpeakText {
 
     private Language language;
     private String text;
-    private String cacheId; // TODO Task to update cacheId when null
+    private String cacheId;
 
     public SpeakText() {
     }
