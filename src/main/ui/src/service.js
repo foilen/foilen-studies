@@ -8,10 +8,17 @@ export class Service {
         })
     }
 
-    getUser() {
+    userGet() {
         return this.axiosInstance.get('/user')
     }
 
+    wordListList() {
+        return this.axiosInstance.get('/wordList/')
+    }
+
+    wordList(id) {
+        return this.axiosInstance.get(`/wordList/${id}`)
+    }
 }
 
 export function autoRetry(context, promiseProvider, delayInSec) {
