@@ -4,7 +4,7 @@ import {toast} from "react-toastify";
 export class Service {
     constructor() {
         this.axiosInstance = axios.create({
-            baseURL: 'http://localhost:8080',
+            baseURL: '',
         })
     }
 
