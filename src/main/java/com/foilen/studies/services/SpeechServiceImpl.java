@@ -1,6 +1,8 @@
 package com.foilen.studies.services;
 
 import com.foilen.smalltools.tools.AbstractBasics;
+import com.foilen.smalltools.tools.CloseableTools;
+import com.foilen.smalltools.tools.FileTools;
 import com.foilen.smalltools.tools.ResourceTools;
 import com.foilen.studies.data.SpeakTextCacheFileRepository;
 import com.foilen.studies.data.WordRepository;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -37,9 +41,22 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
 
     @PostConstruct
     public void init() throws IOException {
+
+        // Check if it is a file on the working directory
+        InputStream userJsonStream;
+        if (FileTools.exists(userjson)) {
+            logger.info("Get the Google user in file {}", userjson);
+            userJsonStream = new FileInputStream(userjson);
+        } else {
+            logger.info("Get the Google user in resource {}", userjson);
+            userJsonStream = ResourceTools.getResourceAsStream(userjson);
+        }
+
         settings = TextToSpeechSettings.newBuilder()
-                .setCredentialsProvider(FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(ResourceTools.getResourceAsStream(userjson))))
+                .setCredentialsProvider(FixedCredentialsProvider.create(ServiceAccountCredentials.fromStream(userJsonStream)))
                 .build();
+
+        CloseableTools.close(userJsonStream);
     }
 
     @Override

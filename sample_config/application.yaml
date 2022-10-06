@@ -26,4 +26,4 @@ spring:
 
 google:
   tts:
-    userjson: /google-service-account.json
+    userjson: google-service-account.json
