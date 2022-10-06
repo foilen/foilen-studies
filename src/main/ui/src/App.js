@@ -11,7 +11,7 @@ import VocabularyPage from "./vocabulary/VocabularyPage";
 import Footer from "./layout/Footer";
 
 function Page() {
-    return <div className="Page container-fluid"><Outlet/></div>;
+    return <div className="Page"><Outlet/></div>;
 }
 
 function App() {

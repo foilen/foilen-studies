@@ -148,14 +148,16 @@ function VocabularyPage() {
                                 {wIdx === currentWordIdx &&
                                     <div>
                                         <div className="row">
-                                            <div className="col-12">
+                                            <div className="col-12 col-sm-5 col-md-3">
                                                 <img src={playImage} alt="Dire le mot"
+                                                     width="150px" height="150px"
+                                                     className="mx-auto d-block"
                                                      onClick={() => playMp3(wordToFind.speakText.cacheId)}/>
                                             </div>
                                         </div>
                                         <hr/>
                                         <div className="row">
-                                            <div className="col-11 col-sm-4 col-md-2">
+                                            <div className="col-10 col-sm-4 col-md-2">
                                                 <input type="text" className="form-control"
                                                        autocomplete="off"
                                                        name="answer"
