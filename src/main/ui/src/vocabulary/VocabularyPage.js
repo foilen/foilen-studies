@@ -29,7 +29,11 @@ function VocabularyPage() {
 
     useEffect(() => {
         autoRetry('Get Word Lists', () => window.service.wordListList(), 5000).then(response => {
-            setWordLists(response.data.items)
+            let items = response.data.items
+            if (!items) {
+                items = []
+            }
+            setWordLists(items)
         })
     }, [])
 
