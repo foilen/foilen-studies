@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {autoRetry} from "../service";
 import lodash from "lodash";
 import playImage from "./play.png";
-import {updateFormValue} from "../common/Forms";
 
 function VocabularyPage() {
 
@@ -115,6 +114,11 @@ function VocabularyPage() {
 
     }
 
+    function updateAnswer(e) {
+        let value = e.target.value.toLowerCase()
+        setUserAnswer(prevState => ({...prevState, answer: value}))
+    }
+
     return (
         <div className="row">
             <div className="col">
@@ -153,9 +157,10 @@ function VocabularyPage() {
                                         <div className="row">
                                             <div className="col-11 col-sm-4 col-md-2">
                                                 <input type="text" className="form-control"
+                                                       autocomplete="off"
                                                        name="answer"
                                                        value={userAnswer.answer}
-                                                       onChange={(e) => updateFormValue(e, userAnswer, setUserAnswer)}
+                                                       onChange={(e) => updateAnswer(e, userAnswer, setUserAnswer)}
                                                 />
                                             </div>
                                             <div className="col-1 col-sm-1 col-md-1">
