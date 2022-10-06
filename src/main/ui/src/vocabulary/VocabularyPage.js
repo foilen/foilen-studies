@@ -77,7 +77,7 @@ function VocabularyPage() {
     function validateAnswer() {
         let currentWord = wordsToFind[currentWordIdx]
         let expected = currentWord.word
-        let actual = userAnswer.answer
+        let actual = userAnswer.answer.trim()
 
         setTransition(true)
         let nextScore = {...score};
@@ -163,7 +163,7 @@ function VocabularyPage() {
                                         <div className="row">
                                             <div className="col-10 col-sm-4 col-md-2">
                                                 <input type="text" className="form-control"
-                                                       autocomplete="off"
+                                                       autoComplete="off"
                                                        name="answer"
                                                        value={userAnswer.answer}
                                                        onChange={(e) => updateAnswer(e, userAnswer, setUserAnswer)}
