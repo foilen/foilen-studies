@@ -9,7 +9,6 @@ function VocabularyPage() {
     const [wordLists, setWordLists] = useState([])
 
     // Main game
-    const [selectedWordList, setSelectedWordList] = useState(null)
     const [wordsToFind, setWordsToFind] = useState(null)
     const [currentWordIdx, setCurrentWordIdx] = useState(null)
 
@@ -33,14 +32,39 @@ function VocabularyPage() {
             if (!items) {
                 items = []
             }
+            for (const item of items) {
+                item.choice = {
+                    selected: false,
+                    anyScoreCount: item.wordIds.length,
+                }
+            }
             setWordLists(items)
         })
     }, [])
 
-    function chooseList(wordList) {
-        setSelectedWordList(wordList)
+    function toggleSelect(wordListIdx) {
+        let nextWordLists = [...wordLists]
+        wordLists[wordListIdx].choice.selected = !wordLists[wordListIdx].choice.selected
+        setWordLists(nextWordLists)
+    }
 
-        autoRetry('Get Words', () => window.service.wordList(wordList.id), 5000).then(response => {
+    function changeAnyScoreCount(wordListIdx, value) {
+        let nextWordLists = [...wordLists]
+        wordLists[wordListIdx].choice.anyScoreCount = value
+        setWordLists(nextWordLists)
+    }
+
+    function startWithParameters() {
+        const selectedWordLists = wordLists.filter(wl => wl.choice.selected)
+        const form = {
+            parameters: selectedWordLists.map(wl => ({
+                wordListId: wl.id,
+                anyScoreCount: wl.choice.anyScoreCount,
+            }))
+        }
+
+        // Get the random list
+        autoRetry('Get Words', () => window.service.wordListRandom(form), 5000).then(response => {
             startGame(response.data.items);
         })
     }
@@ -130,17 +154,31 @@ function VocabularyPage() {
                 <h2>Vocabulaire</h2>
 
                 { /* List the word lists */}
-                {!selectedWordList &&
+                {!wordsToFind && !finalScore &&
                     <div>
                         <p>Choisi une liste</p>
-                        <ul> {wordLists.map(wordList =>
+                        <ul> {wordLists.map((wordList, wordListIdx) =>
                             <li key={wordList.id}>
+                                <input className="form-check-input" type="checkbox"
+                                       checked={wordList.choice.selected}
+                                       onChange={() => toggleSelect(wordListIdx)}
+                                />
                                 {wordList.name} ({wordList.wordIds.length} mots)
-                                <button className="btn btn-success"
-                                        onClick={() => chooseList(wordList)}>Démarrer</button>
+                                {wordList.choice.selected &&
+                                    <input type="number"
+                                           value={wordList.choice.anyScoreCount}
+                                           onChange={e => changeAnyScoreCount(wordListIdx, e.target.value)}
+                                    />
+                                }
                             </li>
                         )}
                         </ul>
+                        <button className="btn btn-primary"
+                                onClick={() => startWithParameters()}
+                                disabled={wordLists.every(wl => !wl.choice.selected)}
+                        >
+                            Démarrer
+                        </button>
                     </div>
                 }
 

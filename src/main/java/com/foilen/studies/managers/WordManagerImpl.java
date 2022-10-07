@@ -1,6 +1,7 @@
 package com.foilen.studies.managers;
 
 import com.foilen.smalltools.tools.AbstractBasics;
+import com.foilen.studies.controllers.models.RandomWordListForm;
 import com.foilen.studies.data.WordListRepository;
 import com.foilen.studies.data.WordRepository;
 import com.foilen.studies.data.vocabulary.Language;
@@ -75,6 +76,35 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         }
 
         return StreamSupport.stream(wordRepository.findAllById(wordList.getWordIds()).spliterator(), false)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Word> randomWord(String userId, RandomWordListForm form) {
+        Set<String> wordIds = new HashSet<>();
+        form.getParameters().forEach(parameter -> {
+            var wordList = wordListRepository.findByIdAndOwnerUserId(parameter.getWordListId(), userId);
+            if (wordList != null) {
+                if (parameter.getAnyScoreCount() == null) {
+                    // Add all
+                    wordIds.addAll(wordList.getWordIds());
+                } else {
+                    // Add count
+                    Set<String> bucketWordIds = new HashSet<>(wordList.getWordIds());
+                    bucketWordIds.removeAll(wordIds);
+                    if (bucketWordIds.size() <= parameter.getAnyScoreCount()) {
+                        // Add the full bucket
+                        wordIds.addAll(bucketWordIds);
+                    } else {
+                        // Shuffle and add desired amount
+                        List<String> bucketWordIdsList = new ArrayList<>(bucketWordIds);
+                        Collections.shuffle(bucketWordIdsList);
+                        bucketWordIdsList.stream().limit(parameter.getAnyScoreCount()).forEach(wordIds::add);
+                    }
+                }
+            }
+        });
+        return StreamSupport.stream(wordRepository.findAllById(wordIds).spliterator(), false)
                 .collect(Collectors.toList());
     }
 

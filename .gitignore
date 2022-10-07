@@ -39,3 +39,4 @@ out/
 ### Local Config ###
 src/main/resources/application.yaml
 src/main/resources/google-service-account.json
+_*

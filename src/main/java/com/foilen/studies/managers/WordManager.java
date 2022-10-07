@@ -1,5 +1,6 @@
 package com.foilen.studies.managers;
 
+import com.foilen.studies.controllers.models.RandomWordListForm;
 import com.foilen.studies.data.vocabulary.Word;
 import com.foilen.studies.data.vocabulary.WordList;
 
@@ -11,4 +12,7 @@ public interface WordManager {
     List<WordList> listWordList(String userId);
 
     List<Word> listWord(String userId, String wordListId);
+
+    List<Word> randomWord(String userId, RandomWordListForm form);
+
 }

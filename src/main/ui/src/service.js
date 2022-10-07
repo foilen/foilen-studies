@@ -19,6 +19,10 @@ export class Service {
     wordList(id) {
         return this.axiosInstance.get(`/wordList/${id}`)
     }
+
+    wordListRandom(form) {
+        return this.axiosInstance.post('/wordList/random', form)
+    }
 }
 
 export function autoRetry(context, promiseProvider, delayInSec) {
