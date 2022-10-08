@@ -106,6 +106,10 @@ function VocabularyPage() {
         setTransition(true)
         let nextScore = {...score};
         let nextWrongAnswers = [...wrongAnswers]
+        const trackForm = {
+            wordId: currentWord.id,
+            answer: actual,
+        }
         if (expected === actual) {
             // TODO Happy sound
             ++nextScore.success
@@ -113,6 +117,7 @@ function VocabularyPage() {
                 isSuccess: true,
                 message: 'Bravo!',
             })
+            trackForm.success = true
         } else {
             // TODO Sad sound
             ++nextScore.fails
@@ -122,8 +127,12 @@ function VocabularyPage() {
             })
             nextWrongAnswers = [...nextWrongAnswers, currentWord]
             setWrongAnswers(nextWrongAnswers)
+            trackForm.success = false
         }
         setScore(nextScore)
+
+        // Send tracking
+        autoRetry('Send tracking', () => window.service.wordListTrack(trackForm), 5000)
 
         // Timer and go to next or show summary
         setTimeout(() => {

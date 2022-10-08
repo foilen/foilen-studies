@@ -23,6 +23,9 @@ export class Service {
     wordListRandom(form) {
         return this.axiosInstance.post('/wordList/random', form)
     }
+    wordListTrack(form) {
+        return this.axiosInstance.post('/wordList/track', form)
+    }
 }
 
 export function autoRetry(context, promiseProvider, delayInSec) {

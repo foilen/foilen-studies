@@ -1,6 +1,8 @@
 package com.foilen.studies.managers;
 
+import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.studies.controllers.models.RandomWordListForm;
+import com.foilen.studies.controllers.models.TrackForm;
 import com.foilen.studies.data.vocabulary.Word;
 import com.foilen.studies.data.vocabulary.WordList;
 
@@ -15,4 +17,5 @@ public interface WordManager {
 
     List<Word> randomWord(String userId, RandomWordListForm form);
 
+    FormResult track(String userId, TrackForm form);
 }

@@ -1,6 +1,8 @@
 package com.foilen.studies.controllers;
 
+import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.studies.controllers.models.RandomWordListForm;
+import com.foilen.studies.controllers.models.TrackForm;
 import com.foilen.studies.controllers.models.WordListListResult;
 import com.foilen.studies.controllers.models.WordListResult;
 import com.foilen.studies.managers.UserManager;
@@ -49,6 +51,16 @@ public class WordListController {
         var result = new WordListResult();
         result.setItems(wordManager.randomWord(userDetails.getId(), form));
         return result;
+    }
+
+    @PostMapping("/track")
+    public FormResult track(
+            Authentication authentication,
+            @RequestBody TrackForm form
+    ) {
+        var userDetails = userManager.getOrCreateUser(authentication);
+
+        return wordManager.track(userDetails.getId(), form);
     }
 
 }

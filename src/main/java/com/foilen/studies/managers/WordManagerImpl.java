@@ -1,13 +1,14 @@
 package com.foilen.studies.managers;
 
+import com.foilen.smalltools.restapi.model.FormResult;
+import com.foilen.smalltools.restapi.services.FormValidationTools;
 import com.foilen.smalltools.tools.AbstractBasics;
 import com.foilen.studies.controllers.models.RandomWordListForm;
+import com.foilen.studies.controllers.models.TrackForm;
+import com.foilen.studies.data.UserScoresRepository;
 import com.foilen.studies.data.WordListRepository;
 import com.foilen.studies.data.WordRepository;
-import com.foilen.studies.data.vocabulary.Language;
-import com.foilen.studies.data.vocabulary.SpeakText;
-import com.foilen.studies.data.vocabulary.Word;
-import com.foilen.studies.data.vocabulary.WordList;
+import com.foilen.studies.data.vocabulary.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +27,14 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     @Autowired
     private WordRepository wordRepository;
     @Autowired
+    private UserScoresRepository userScoresRepository;
+    @Autowired
     private WordListRepository wordListRepository;
 
     @Override
     public void createWordList(String userId, String listName, String wordsInText) {
+
+        logger.info("User {} is creating a list named {}", userId, listName);
 
         var wordNames = tokenize(wordsInText);
         logger.info("The list will have {} words", wordNames.size());
@@ -106,6 +111,54 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         });
         return StreamSupport.stream(wordRepository.findAllById(wordIds).spliterator(), false)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public FormResult track(String userId, TrackForm form) {
+
+        logger.info("Tracking score for user {} : {}", userId, form);
+
+        // Validate
+        FormResult formResult = new FormResult();
+        FormValidationTools.validateMandatory(formResult, "wordId", form.getWordId());
+        if (!formResult.isSuccess()) {
+            return formResult;
+        }
+
+        // Get the current scores and update them
+        var userScores = getOrCreateUserScores(userId);
+        var score = userScores.getScoreByWordId().computeIfAbsent(form.getWordId(), wordId -> new Score());
+        var lastScoreItems = score.getLastScoreItems();
+        lastScoreItems.add(new ScoreItem(form.isSuccess(), form.getAnswer()));
+
+        // Keep only last 6
+        while (lastScoreItems.size() > 6) {
+            lastScoreItems.remove(0);
+        }
+
+        // Compute score
+        int successes = (int) lastScoreItems.stream().filter(ScoreItem::isSuccess).count();
+        int total = lastScoreItems.size();
+        int percent = 100 * successes / total;
+        if (percent > 66) { // Good
+            score.setScore(3);
+        } else if (percent > 33) { // Average
+            score.setScore(2);
+        } else { // Bad
+            score.setScore(1);
+        }
+        userScoresRepository.save(userScores);
+        return formResult;
+    }
+
+    private UserScores getOrCreateUserScores(String userId) {
+        var userScores = userScoresRepository.findById(userId).orElse(null);
+        if (userScores == null) {
+            userScores = new UserScores();
+            userScores.setUserId(userId);
+            userScores = userScoresRepository.save(userScores);
+        }
+        return userScores;
     }
 
     private static final Set<Character> separators = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' '));
