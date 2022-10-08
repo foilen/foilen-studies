@@ -267,7 +267,7 @@ function VocabularyPage() {
                                     )}
                                     </ul>
 
-                                    <button className="btn btn-success"
+                                    <button className="btn btn-danger"
                                             onClick={() => startGame(finalScore.wrongAnswers)}>
                                         Démarrer avec juste les mots problématiques
                                     </button>
