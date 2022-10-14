@@ -1,10 +1,7 @@
 package com.foilen.studies.controllers;
 
 import com.foilen.smalltools.restapi.model.FormResult;
-import com.foilen.studies.controllers.models.RandomWordListForm;
-import com.foilen.studies.controllers.models.TrackForm;
-import com.foilen.studies.controllers.models.WordListListResult;
-import com.foilen.studies.controllers.models.WordListResult;
+import com.foilen.studies.controllers.models.*;
 import com.foilen.studies.managers.UserManager;
 import com.foilen.studies.managers.WordManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,15 +26,37 @@ public class WordListController {
         return result;
     }
 
+    @PostMapping("/")
+    public FormResult save(
+            Authentication authentication,
+            @RequestBody WordListExpended form
+    ) {
+        var userDetails = userManager.getOrCreateUser(authentication);
+
+        return wordManager.listWordSave(userDetails.getId(), form);
+    }
+
     @GetMapping("/{wordListId}")
-    public WordListResult list(
+    public WordListSingleResult get(
             Authentication authentication,
             @PathVariable String wordListId
     ) {
         var userDetails = userManager.getOrCreateUser(authentication);
 
+        var result = new WordListSingleResult();
+        result.setItem(wordManager.getWordListExpended(userDetails.getId(), wordListId));
+        return result;
+    }
+
+    @PostMapping("/bulkSplit")
+    public WordListResult bulkSplit(
+            Authentication authentication,
+            @RequestBody BulkSplitForm form
+    ) {
+        var userDetails = userManager.getOrCreateUser(authentication);
+
         var result = new WordListResult();
-        result.setItems(wordManager.listWord(userDetails.getId(), wordListId));
+        result.setItems(wordManager.bulkSplit(userDetails.getId(), form.getAll()));
         return result;
     }
 

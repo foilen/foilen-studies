@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {autoRetry} from "../service";
 import lodash from "lodash";
 import playImage from "./play.png";
+import {NavLink} from "react-router-dom";
 
 function VocabularyPage() {
 
@@ -158,13 +159,16 @@ function VocabularyPage() {
 
     return (
         <div className="row">
-            <div className="col">
+            <div className="col col-sm-6 col-md-4 col-lg-3">
 
                 <h2>Vocabulaire</h2>
 
                 { /* List the word lists */}
                 {!wordsToFind && !finalScore &&
                     <div>
+                        <div className="float-end">
+                            <NavLink to="/vocabulary/create" className="btn btn-success">Créer</NavLink>
+                        </div>
                         <p>Choisi une liste</p>
                         <ul> {wordLists.map((wordList, wordListIdx) =>
                             <li key={wordList.id}>
@@ -179,6 +183,7 @@ function VocabularyPage() {
                                            onChange={e => changeAnyScoreCount(wordListIdx, e.target.value)}
                                     />
                                 }
+                                <NavLink to={`/vocabulary/${wordList.id}`} className="btn btn-outline-primary">Éditer</NavLink>
                             </li>
                         )}
                         </ul>
@@ -288,7 +293,7 @@ function VocabularyPage() {
 
             </div>
         </div>
-    );
+    )
 }
 
 export default VocabularyPage

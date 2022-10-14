@@ -14,12 +14,10 @@ function Header() {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <NavLink to="/"
-                                     className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>Accueil</NavLink>
+                            <NavLink to="/" className="nav-link">Accueil</NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink to="/vocabulary"
-                                     className={({isActive}) => isActive ? "nav-link active" : "nav-link"}>Vocabulaire</NavLink>
+                            <NavLink to="/vocabulary" className="nav-link">Vocabulaire</NavLink>
                         </li>
                     </ul>
                 </div>

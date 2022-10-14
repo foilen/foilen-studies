@@ -1,10 +1,15 @@
 package com.foilen.studies.managers;
 
+import com.foilen.smalltools.listscomparator.ListComparatorHandler;
+import com.foilen.smalltools.listscomparator.ListsComparator;
 import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.smalltools.restapi.services.FormValidationTools;
 import com.foilen.smalltools.tools.AbstractBasics;
+import com.foilen.smalltools.tools.CollectionsTools;
+import com.foilen.smalltools.tools.StringTools;
 import com.foilen.studies.controllers.models.RandomWordListForm;
 import com.foilen.studies.controllers.models.TrackForm;
+import com.foilen.studies.controllers.models.WordListExpended;
 import com.foilen.studies.data.UserScoresRepository;
 import com.foilen.studies.data.WordListRepository;
 import com.foilen.studies.data.WordRepository;
@@ -32,12 +37,12 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     private WordListRepository wordListRepository;
 
     @Override
-    public void createWordList(String userId, String listName, String wordsInText) {
+    public List<Word> bulkSplit(String userId, String wordsInText) {
 
-        logger.info("User {} is creating a list named {}", userId, listName);
+        logger.info("User {} is getting words in bulk", userId);
 
         var wordNames = tokenize(wordsInText);
-        logger.info("The list will have {} words", wordNames.size());
+        logger.info("Will have {} words", wordNames.size());
 
         // Get the words already created by me
         var existingWords = wordRepository.findAllByOwnerUserIdAndWordIn(userId, wordNames);
@@ -59,28 +64,8 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
             wordByName.put(wordName, newWord);
         }
 
-        // Create the word list
-        logger.info("Create list {}", listName);
-        var wordList = new WordList();
-        wordList.setName(listName);
-        wordList.setOwnerUserId(userId);
-        wordList.setWordIds(wordByName.values().stream().map(Word::getId).collect(Collectors.toList()));
-        wordListRepository.save(wordList);
-    }
-
-    @Override
-    public List<WordList> listWordList(String userId) {
-        return wordListRepository.findAllByOwnerUserIdOrderByName(userId);
-    }
-
-    @Override
-    public List<Word> listWord(String userId, String wordListId) {
-        var wordList = wordListRepository.findByIdAndOwnerUserId(wordListId, userId);
-        if (wordList == null) {
-            throw new ResponseStatusException(NOT_FOUND, "Word list does not exist");
-        }
-
-        return StreamSupport.stream(wordRepository.findAllById(wordList.getWordIds()).spliterator(), false)
+        return wordByName.values().stream()
+                .sorted(Comparator.comparing(Word::getWord))
                 .collect(Collectors.toList());
     }
 
@@ -151,6 +136,88 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         return formResult;
     }
 
+    @Override
+    public List<WordList> listWordList(String userId) {
+        return wordListRepository.findAllByOwnerUserIdOrderByName(userId);
+    }
+
+    @Override
+    public FormResult listWordSave(String userId, WordListExpended form) {
+
+        // Validation
+        FormResult formResult = new FormResult();
+        FormValidationTools.validateMandatory(formResult, "name", form.getName());
+
+        if (!formResult.isSuccess()) {
+            return formResult;
+        }
+
+        // Get the words
+        var desiredWords = form.getWords();
+        var desiredIds = desiredWords.stream().map(Word::getId).collect(Collectors.toSet());
+        var existingWords = wordRepository.findAllByOwnerUserIdAndIdIn(userId, desiredIds);
+        var existingWordIds = existingWords.stream().map(Word::getId).collect(Collectors.toSet());
+        if (existingWords.size() != desiredWords.size()) {
+            desiredIds.removeAll(existingWordIds);
+            desiredIds.forEach(missingId -> CollectionsTools.getOrCreateEmptyArrayList(formResult.getValidationErrorsByField(), "word." + missingId, String.class).add("Not found"));
+            return formResult;
+        }
+
+        // Get or create
+        var wordList = wordListRepository.findByIdAndOwnerUserId(form.getId(), userId);
+        if (wordList == null) {
+            wordList = new WordList();
+            wordList.setOwnerUserId(userId);
+        }
+        wordList.setName(form.getName());
+        wordList.setWordIds(new ArrayList<>(existingWordIds));
+
+        // Update the speech if changed
+        ListsComparator.compareStreams(
+                existingWords.stream().sorted(Comparator.comparing(Word::getId)),
+                desiredWords.stream().sorted(Comparator.comparing(Word::getId)),
+                (a, b) -> a.getId().compareTo(b.getId()),
+                new ListComparatorHandler<>() {
+                    @Override
+                    public void both(Word existing, Word desired) {
+                        if (!StringTools.safeEquals(existing.getSpeakText().getText(), desired.getSpeakText().getText())) {
+                            existing.getSpeakText().setText(desired.getSpeakText().getText());
+                            existing.getSpeakText().computeCacheId();
+                            wordRepository.save(existing);
+                        }
+                    }
+
+                    @Override
+                    public void leftOnly(Word existing) {
+                    }
+
+                    @Override
+                    public void rightOnly(Word desired) {
+                    }
+                }
+        );
+
+        wordListRepository.save(wordList);
+        return formResult;
+    }
+
+    @Override
+    public WordListExpended getWordListExpended(String userId, String wordListId) {
+        var wordList = wordListRepository.findByIdAndOwnerUserId(wordListId, userId);
+        if (wordList == null) {
+            throw new ResponseStatusException(NOT_FOUND, "Word list does not exist");
+        }
+
+        var response = new WordListExpended();
+        response.setId(wordList.getId());
+        response.setName(wordList.getName());
+        response.setOwnerUserId(wordList.getOwnerUserId());
+        response.setWords(StreamSupport.stream(wordRepository.findAllById(wordList.getWordIds()).spliterator(), false)
+                .collect(Collectors.toList()));
+
+        return response;
+    }
+
     private UserScores getOrCreateUserScores(String userId) {
         var userScores = userScoresRepository.findById(userId).orElse(null);
         if (userScores == null) {
@@ -174,7 +241,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
             var ch = wordsInText.charAt(i);
             if (separators.contains(ch)) {
                 if (!nextWord.isEmpty()) {
-                    words.add(nextWord.toString());
+                    words.add(nextWord.toString().toLowerCase());
                 }
                 nextWord = new StringBuilder();
             } else {
@@ -185,7 +252,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         // Last word
         if (!nextWord.isEmpty()) {
-            words.add(nextWord.toString());
+            words.add(nextWord.toString().toLowerCase());
         }
 
         return new ArrayList<>(words);

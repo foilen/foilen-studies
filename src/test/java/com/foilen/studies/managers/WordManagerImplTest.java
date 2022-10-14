@@ -13,10 +13,10 @@ class WordManagerImplTest {
                 first,second, third
                 fourth/fifth. sixth
                                 
-                super-high,fifth
+                super-high,fifth,FIFTH,École
                 """;
         AssertTools.assertJsonComparison(
-                Arrays.asList("first", "second", "third", "fourth", "fifth", "sixth", "super-high"),
+                Arrays.asList("first", "second", "third", "fourth", "fifth", "sixth", "super-high", "école"),
                 WordManagerImpl.tokenize(wordsInText)
         );
     }

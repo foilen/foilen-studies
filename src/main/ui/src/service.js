@@ -16,10 +16,17 @@ export class Service {
         return this.axiosInstance.get('/wordList/')
     }
 
-    wordList(id) {
+    wordListSave(form) {
+        return this.axiosInstance.post(`/wordList/`, form)
+    }
+
+    wordListGet(id) {
         return this.axiosInstance.get(`/wordList/${id}`)
     }
 
+    wordListBulkSplit(form) {
+        return this.axiosInstance.post('/wordList/bulkSplit', form)
+    }
     wordListRandom(form) {
         return this.axiosInstance.post('/wordList/random', form)
     }

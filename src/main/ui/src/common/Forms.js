@@ -55,16 +55,6 @@ export function updateFormValue(event, form, setForm) {
     let newForm = {...form}
     newForm[name] = value
     setForm(newForm)
-}
 
-export function updateSearchFormValue(event, searchForm, setSearchForm) {
-    const target = event.target
-    const value = target.type === 'checkbox' ? target.checked : target.value
-    const name = target.name
-
-    let newSearchForm = {...searchForm}
-    newSearchForm[name] = value
-    setSearchForm(newSearchForm)
-
-    return newSearchForm
+    return newForm
 }

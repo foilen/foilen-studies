@@ -8,6 +8,7 @@ import {HashRouter as Router, Outlet, Route, Routes} from "react-router-dom";
 import Header from './layout/Header.js';
 import HomePage from "./home/HomePage";
 import VocabularyPage from "./vocabulary/VocabularyPage";
+import VocabularyEditPage from "./vocabulary/VocabularyEditPage";
 import Footer from "./layout/Footer";
 
 function Page() {
@@ -23,7 +24,11 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Page/>}>
                             <Route path="" element={<HomePage/>}/>
-                            <Route path="vocabulary" element={<VocabularyPage/>}/>
+                            <Route path="vocabulary/">
+                                <Route path="" element={<VocabularyPage/>}/>
+                                <Route path="create" element={<VocabularyEditPage/>}/>
+                                <Route path=":wordListId" element={<VocabularyEditPage/>}/>
+                            </Route>
                         </Route>
                     </Routes>
                     <Footer/>
