@@ -37,6 +37,16 @@ function VocabularyEditPage() {
         setForm({...form, words: nextWords})
     }
 
+    function updateSpeakText(id, e) {
+        const nextWords = form.words.map(word => {
+            if (word.id === id) {
+                word.speakText.text = e.target.value
+            }
+            return word
+        })
+        setForm({...form, words: nextWords})
+    }
+
     function removeWord(id) {
         const nextWords = form.words.filter(word => word.id !== id)
         setForm({...form, words: nextWords})
@@ -77,7 +87,10 @@ function VocabularyEditPage() {
                        onChange={(e) => updateFormValue(e, form, setForm)}
                 />
 
-                {form.words.map(word => <WordItem key={word.id} word={word} onDelete={() => removeWord(word.id)}/>)}
+                {form.words.map(word => <WordItem key={word.id} word={word}
+                                                  onSpeakTextChange={e => updateSpeakText(word.id, e)}
+                                                  onDelete={() => removeWord(word.id)}/>
+                )}
 
                 <hr/>
 

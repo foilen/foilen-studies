@@ -3,7 +3,7 @@ package com.foilen.studies.data.vocabulary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-// TODO Scheduled Task - Delete documents when cacheId is no more used by any Word
+// TODO Scheduled Task - Delete documents when cacheId is no more used by any Word for 1 month
 @Document
 public class SpeakTextCacheFile {
 

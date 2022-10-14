@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO Scheduled Task - Delete score for Words that doesn't exist anymore
+// TODO Scheduled Task - Delete score for Words that doesn't exist anymore for 2 months
 @Document
 public class UserScores {
 

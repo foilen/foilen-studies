@@ -5,7 +5,10 @@ import './WordItem.css'
  *
  * props.word: The word to display
  *
+ * props.onSpeakTextChange: (optional) The action to do when changing
  * props.onDelete: (optional) The action to do when deleting
+ *
+ * // TODO Show score
  */
 function WordItem(props) {
 
@@ -15,7 +18,14 @@ function WordItem(props) {
         <div className="word">
             {props.onDelete && <button className="btn btn-danger float-end" onClick={e => props.onDelete(e)}>X</button>}
             <div><strong>Mot:</strong> {word.word}</div>
-            <div><strong>Texte dit:</strong> {word.speakText.text}</div> { /* TODO Edit speakText */ }
+            {props.onSpeakTextChange &&
+                <div>
+                    <input type="text" className="form-control" value={word.speakText.text}
+                           onChange={e => props.onSpeakTextChange(e)}/>
+                </div>
+                ||
+                <div><strong>Texte dit:</strong> {word.speakText.text}</div>
+            }
         </div>
     )
 }
