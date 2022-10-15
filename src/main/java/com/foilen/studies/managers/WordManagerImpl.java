@@ -116,8 +116,8 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         var lastScoreItems = score.getLastScoreItems();
         lastScoreItems.add(new ScoreItem(form.isSuccess(), form.getAnswer()));
 
-        // Keep only last 6
-        while (lastScoreItems.size() > 6) {
+        // Keep only last 10
+        while (lastScoreItems.size() > 10) {
             lastScoreItems.remove(0);
         }
 
