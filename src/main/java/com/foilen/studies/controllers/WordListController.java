@@ -18,10 +18,10 @@ public class WordListController {
     private WordManager wordManager;
 
     @GetMapping("/")
-    public WordListListResult list(Authentication authentication) {
+    public WordListWithScoreListResult list(Authentication authentication) {
         var userDetails = userManager.getOrCreateUser(authentication);
 
-        var result = new WordListListResult();
+        var result = new WordListWithScoreListResult();
         result.setItems(wordManager.listWordList(userDetails.getId()));
         return result;
     }

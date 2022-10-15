@@ -6,10 +6,9 @@ import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.smalltools.restapi.services.FormValidationTools;
 import com.foilen.smalltools.tools.AbstractBasics;
 import com.foilen.smalltools.tools.CollectionsTools;
+import com.foilen.smalltools.tools.JsonTools;
 import com.foilen.smalltools.tools.StringTools;
-import com.foilen.studies.controllers.models.RandomWordListForm;
-import com.foilen.studies.controllers.models.TrackForm;
-import com.foilen.studies.controllers.models.WordListExpended;
+import com.foilen.studies.controllers.models.*;
 import com.foilen.studies.data.UserScoresRepository;
 import com.foilen.studies.data.WordListRepository;
 import com.foilen.studies.data.WordRepository;
@@ -137,8 +136,40 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     }
 
     @Override
-    public List<WordList> listWordList(String userId) {
-        return wordListRepository.findAllByOwnerUserIdOrderByName(userId);
+    public List<WordListWithScore> listWordList(String userId) {
+
+        var userScores = getOrCreateUserScores(userId);
+
+        var wordListWithScore = wordListRepository.findAllByOwnerUserIdOrderByName(userId).stream()
+                .map(wordList -> {
+                    var item = JsonTools.clone(wordList, WordListWithScore.class);
+                    var scoreByWordId = userScores.getScoreByWordId();
+
+                    item.getWordIds().forEach(wordId -> {
+                        var score = scoreByWordId.get(wordId);
+                        Scores scores = item.getScores();
+                        if (score == null) {
+                            scores.addNoScore();
+                        } else {
+                            switch (score.getScore()) {
+                            case 1:
+                                scores.addBad();
+                                break;
+                            case 2:
+                                scores.addAverage();
+                                break;
+                            case 3:
+                                scores.addGood();
+                                break;
+                            }
+                        }
+                    });
+
+                    return item;
+                })
+                .collect(Collectors.toList());
+
+        return wordListWithScore;
     }
 
     @Override

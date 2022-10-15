@@ -4,8 +4,8 @@ import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.studies.controllers.models.RandomWordListForm;
 import com.foilen.studies.controllers.models.TrackForm;
 import com.foilen.studies.controllers.models.WordListExpended;
+import com.foilen.studies.controllers.models.WordListWithScore;
 import com.foilen.studies.data.vocabulary.Word;
-import com.foilen.studies.data.vocabulary.WordList;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface WordManager {
 
     FormResult track(String userId, TrackForm form);
 
-    List<WordList> listWordList(String userId);
+    List<WordListWithScore> listWordList(String userId);
 
     FormResult saveWordList(String userId, WordListExpended form);
 

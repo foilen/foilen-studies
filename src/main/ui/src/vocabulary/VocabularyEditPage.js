@@ -60,7 +60,7 @@ function VocabularyEditPage() {
 
     return (
         <div className="row">
-            <div className="col col-sm-6 col-md-4 col-lg-3">
+            <div className="col col-sm-6 col-md-4 col-lg-4">
 
                 <h2>Ajouter un ou plusieurs mots d'un coup</h2>
                 <p className="text-bg-info">Vous pouvez coller une liste de mots séparés par des espaces, des virgules,

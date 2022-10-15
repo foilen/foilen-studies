@@ -52,11 +52,12 @@ function VocabularyPage() {
 
     function deleteWordList(wordList) {
         if (window.confirm(`Êtes-vous sûr de vouloir effacer la liste ${wordList.name}?`)) {
-        autoRetry('Delete Word List', () => window.service.wordListDelete(wordList.id), 5000).then(() => {
-            let nextWordLists = [...wordLists]
-            lodash.remove(nextWordLists, {id: wordList.id})
-            setWordLists(nextWordLists)
-        })}
+            autoRetry('Delete Word List', () => window.service.wordListDelete(wordList.id), 5000).then(() => {
+                let nextWordLists = [...wordLists]
+                lodash.remove(nextWordLists, {id: wordList.id})
+                setWordLists(nextWordLists)
+            })
+        }
     }
 
     function changeAnyScoreCount(wordListIdx, value) {
@@ -169,7 +170,7 @@ function VocabularyPage() {
 
     return (
         <div className="row">
-            <div className="col col-sm-6 col-md-4 col-lg-3">
+            <div className="col col-sm-6 col-md-4 col-lg-4">
 
                 <h2>Vocabulaire</h2>
 
@@ -193,8 +194,21 @@ function VocabularyPage() {
                                            onChange={e => changeAnyScoreCount(wordListIdx, e.target.value)}
                                     />
                                 }
-                                <NavLink to={`/vocabulary/${wordList.id}`} className="btn btn-outline-primary">Éditer</NavLink>
-                                <button className="btn btn-danger float-end" onClick={() => deleteWordList(wordList)}>X</button>
+                                <NavLink to={`/vocabulary/${wordList.id}`}
+                                         className="btn btn-outline-primary">Éditer</NavLink>
+                                <button className="btn btn-danger float-end"
+                                        onClick={() => deleteWordList(wordList)}>X
+                                </button>
+
+                                <div className="progress">
+                                    <div className="progress-bar bg-danger" role="progressbar"
+                                         style={{width: wordList.scores.badPercentage + '%'}}></div>
+                                    <div className="progress-bar bg-warning" role="progressbar"
+                                         style={{width: wordList.scores.averagePercentage + '%'}}></div>
+                                    <div className="progress-bar bg-success" role="progressbar"
+                                         style={{width: wordList.scores.goodPercentage + '%'}}></div>
+                                </div>
+
                             </div>
                         )}
 
@@ -224,7 +238,7 @@ function VocabularyPage() {
                                         </div>
                                         <hr/>
                                         <div className="row">
-                                            <div className="col-10 col-sm-4 col-md-2">
+                                            <div className="col-10">
                                                 <input type="text" className="form-control"
                                                        autoComplete="off"
                                                        name="answer"
@@ -232,7 +246,7 @@ function VocabularyPage() {
                                                        onChange={(e) => updateAnswer(e, userAnswer, setUserAnswer)}
                                                 />
                                             </div>
-                                            <div className="col-1 col-sm-1 col-md-1">
+                                            <div className="col-1">
                                                 <button className="btn btn-primary"
                                                         disabled={transition}
                                                         onClick={() => validateAnswer()}>OK
