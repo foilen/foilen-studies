@@ -140,7 +140,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         var userScores = getOrCreateUserScores(userId);
 
-        var wordListWithScore = wordListRepository.findAllByOwnerUserIdOrderByName(userId).stream()
+        return wordListRepository.findAllByOwnerUserIdOrderByName(userId).stream()
                 .map(wordList -> {
                     var item = JsonTools.clone(wordList, WordListWithScore.class);
                     var scoreByWordId = userScores.getScoreByWordId();
@@ -152,15 +152,15 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
                             scores.addNoScore();
                         } else {
                             switch (score.getScore()) {
-                            case 1:
-                                scores.addBad();
-                                break;
-                            case 2:
-                                scores.addAverage();
-                                break;
-                            case 3:
-                                scores.addGood();
-                                break;
+                                case 1:
+                                    scores.addBad();
+                                    break;
+                                case 2:
+                                    scores.addAverage();
+                                    break;
+                                case 3:
+                                    scores.addGood();
+                                    break;
                             }
                         }
                     });
@@ -168,8 +168,6 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
                     return item;
                 })
                 .collect(Collectors.toList());
-
-        return wordListWithScore;
     }
 
     @Override
@@ -184,7 +182,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         }
 
         // Get the words
-        var desiredWords = form.getWords();
+        var desiredWords = form.getWords().stream().map(it->JsonTools.clone(it,Word.class)).collect(Collectors.toSet());
         var desiredIds = desiredWords.stream().map(Word::getId).collect(Collectors.toSet());
         var existingWords = wordRepository.findAllByOwnerUserIdAndIdIn(userId, desiredIds);
         var existingWordIds = existingWords.stream().map(Word::getId).collect(Collectors.toSet());
@@ -254,11 +252,21 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
             throw new ResponseStatusException(NOT_FOUND, "Word list does not exist");
         }
 
+        var userScoreByWordId = getOrCreateUserScores(userId).getScoreByWordId();
+
         var response = new WordListExpended();
         response.setId(wordList.getId());
         response.setName(wordList.getName());
         response.setOwnerUserId(wordList.getOwnerUserId());
         response.setWords(StreamSupport.stream(wordRepository.findAllById(wordList.getWordIds()).spliterator(), false)
+                .map(word -> {
+                    var wordWithScore = JsonTools.clone(word, WordWithScore.class);
+                    var score = userScoreByWordId.get(word.getId());
+                    if (score != null) {
+                        wordWithScore.setScore(score.getScore());
+                    }
+                    return wordWithScore;
+                })
                 .collect(Collectors.toList()));
 
         return response;

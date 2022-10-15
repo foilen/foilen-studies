@@ -1,20 +1,18 @@
-package com.foilen.studies.data.vocabulary;
+package com.foilen.studies.controllers.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.foilen.smalltools.restapi.model.AbstractApiBase;
+import com.foilen.studies.data.vocabulary.SpeakText;
 
-@Document
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Word {
+public class WordWithScore extends AbstractApiBase {
 
-    @Id
     private String id;
 
     private String ownerUserId;
 
     private String word;
     private SpeakText speakText;
+
+    private int score;
 
     public String getId() {
         return id;
@@ -46,5 +44,13 @@ public class Word {
 
     public void setSpeakText(SpeakText speakText) {
         this.speakText = speakText;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }

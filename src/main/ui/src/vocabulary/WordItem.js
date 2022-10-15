@@ -8,14 +8,13 @@ import './WordItem.css'
  * props.onSpeakTextChange: (optional) The action to do when changing
  * props.onDelete: (optional) The action to do when deleting
  *
- * // TODO Show score
  */
 function WordItem(props) {
 
     const word = props.word
 
     return (
-        <div className="word">
+        <div className={`word score-${word.score}`}>
             {props.onDelete && <button className="btn btn-danger float-end" onClick={e => props.onDelete(e)}>X</button>}
             <div><strong>Mot:</strong> {word.word}</div>
             {props.onSpeakTextChange &&

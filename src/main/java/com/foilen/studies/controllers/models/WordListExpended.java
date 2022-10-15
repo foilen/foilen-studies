@@ -1,7 +1,6 @@
 package com.foilen.studies.controllers.models;
 
 import com.foilen.smalltools.restapi.model.AbstractApiBase;
-import com.foilen.studies.data.vocabulary.Word;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,7 @@ public class WordListExpended extends AbstractApiBase {
     private String name;
 
     private String ownerUserId;
-    private List<Word> words = new ArrayList<>();
+    private List<WordWithScore> words = new ArrayList<>();
 
     public String getId() {
         return id;
@@ -38,11 +37,11 @@ public class WordListExpended extends AbstractApiBase {
         this.ownerUserId = ownerUserId;
     }
 
-    public List<Word> getWords() {
+    public List<WordWithScore> getWords() {
         return words;
     }
 
-    public void setWords(List<Word> words) {
+    public void setWords(List<WordWithScore> words) {
         this.words = words;
     }
 }

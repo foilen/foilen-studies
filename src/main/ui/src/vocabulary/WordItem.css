@@ -1,4 +1,17 @@
 .word {
     border: #87b7db solid 1px;
     margin-bottom: 5px;
+    padding: 3px;
+}
+
+.score-1 {
+    background-image: linear-gradient(135deg, #ff6161, #ff9494);
+}
+
+.score-2 {
+    background-image: linear-gradient(135deg, #fad10b, #f8de91);
+}
+
+.score-3 {
+    background-image: linear-gradient(135deg, #81c76d, #9dff8e);
 }
