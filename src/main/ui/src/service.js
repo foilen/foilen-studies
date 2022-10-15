@@ -15,15 +15,15 @@ export class Service {
     wordListList() {
         return this.axiosInstance.get('/wordList/')
     }
-
     wordListSave(form) {
         return this.axiosInstance.post(`/wordList/`, form)
     }
-
     wordListGet(id) {
         return this.axiosInstance.get(`/wordList/${id}`)
     }
-
+    wordListDelete(wordListId) {
+        return this.axiosInstance.delete(`/wordList/${wordListId}`)
+    }
     wordListBulkSplit(form) {
         return this.axiosInstance.post('/wordList/bulkSplit', form)
     }

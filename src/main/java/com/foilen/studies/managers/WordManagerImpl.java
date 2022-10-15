@@ -142,7 +142,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     }
 
     @Override
-    public FormResult listWordSave(String userId, WordListExpended form) {
+    public FormResult saveWordList(String userId, WordListExpended form) {
 
         // Validation
         FormResult formResult = new FormResult();
@@ -199,6 +199,21 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         wordListRepository.save(wordList);
         return formResult;
+    }
+
+    @Override
+    public FormResult deleteWordList(String userId, String wordListId) {
+        var wordList = wordListRepository.findByIdAndOwnerUserId(wordListId, userId);
+        FormResult result = new FormResult();
+        if (wordList == null) {
+            result.getGlobalErrors().add("Word list does not exist");
+            return result;
+        }
+
+        logger.info("Deleting word list {} for user {}", wordListId, userId);
+        wordListRepository.delete(wordList);
+
+        return result;
     }
 
     @Override

@@ -3,6 +3,7 @@ import {autoRetry} from "../service";
 import lodash from "lodash";
 import playImage from "./play.png";
 import {NavLink} from "react-router-dom";
+import "./VocabularyPage.css"
 
 function VocabularyPage() {
 
@@ -47,6 +48,15 @@ function VocabularyPage() {
         let nextWordLists = [...wordLists]
         wordLists[wordListIdx].choice.selected = !wordLists[wordListIdx].choice.selected
         setWordLists(nextWordLists)
+    }
+
+    function deleteWordList(wordList) {
+        if (window.confirm(`Êtes-vous sûr de vouloir effacer la liste ${wordList.name}?`)) {
+        autoRetry('Delete Word List', () => window.service.wordListDelete(wordList.id), 5000).then(() => {
+            let nextWordLists = [...wordLists]
+            lodash.remove(nextWordLists, {id: wordList.id})
+            setWordLists(nextWordLists)
+        })}
     }
 
     function changeAnyScoreCount(wordListIdx, value) {
@@ -170,8 +180,8 @@ function VocabularyPage() {
                             <NavLink to="/vocabulary/create" className="btn btn-success">Créer</NavLink>
                         </div>
                         <p>Choisi une liste</p>
-                        <ul> {wordLists.map((wordList, wordListIdx) =>
-                            <li key={wordList.id}>
+                        {wordLists.map((wordList, wordListIdx) =>
+                            <div className="wordList" key={wordList.id}>
                                 <input className="form-check-input" type="checkbox"
                                        checked={wordList.choice.selected}
                                        onChange={() => toggleSelect(wordListIdx)}
@@ -184,9 +194,10 @@ function VocabularyPage() {
                                     />
                                 }
                                 <NavLink to={`/vocabulary/${wordList.id}`} className="btn btn-outline-primary">Éditer</NavLink>
-                            </li>
+                                <button className="btn btn-danger float-end" onClick={() => deleteWordList(wordList)}>X</button>
+                            </div>
                         )}
-                        </ul>
+
                         <button className="btn btn-primary"
                                 onClick={() => startWithParameters()}
                                 disabled={wordLists.every(wl => !wl.choice.selected)}

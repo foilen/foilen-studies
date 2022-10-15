@@ -19,7 +19,9 @@ public interface WordManager {
 
     List<WordList> listWordList(String userId);
 
-    FormResult listWordSave(String userId, WordListExpended form);
+    FormResult saveWordList(String userId, WordListExpended form);
+
+    FormResult deleteWordList(String userId, String wordListId);
 
     WordListExpended getWordListExpended(String userId, String wordListId);
 }

@@ -33,7 +33,7 @@ public class WordListController {
     ) {
         var userDetails = userManager.getOrCreateUser(authentication);
 
-        return wordManager.listWordSave(userDetails.getId(), form);
+        return wordManager.saveWordList(userDetails.getId(), form);
     }
 
     @GetMapping("/{wordListId}")
@@ -46,6 +46,15 @@ public class WordListController {
         var result = new WordListSingleResult();
         result.setItem(wordManager.getWordListExpended(userDetails.getId(), wordListId));
         return result;
+    }
+
+    @DeleteMapping("/{wordListId}")
+    public FormResult delete(
+            Authentication authentication,
+            @PathVariable String wordListId
+    ) {
+        var userDetails = userManager.getOrCreateUser(authentication);
+        return wordManager.deleteWordList(userDetails.getId(), wordListId);
     }
 
     @PostMapping("/bulkSplit")
