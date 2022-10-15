@@ -36,6 +36,7 @@ dependencies {
     implementation 'com.google.auth:google-auth-library-oauth2-http'
 
     // Test
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }

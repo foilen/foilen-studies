@@ -1,9 +1,6 @@
 package com.foilen.studies.services;
 
-import com.foilen.smalltools.tools.AbstractBasics;
-import com.foilen.smalltools.tools.CloseableTools;
-import com.foilen.smalltools.tools.FileTools;
-import com.foilen.smalltools.tools.ResourceTools;
+import com.foilen.smalltools.tools.*;
 import com.foilen.studies.data.SpeakTextCacheFileRepository;
 import com.foilen.studies.data.WordRepository;
 import com.foilen.studies.data.vocabulary.Language;
@@ -16,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,23 +24,32 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
 
     @Autowired
+    private MongoOperations mongoOperations;
+    @Autowired
     private SpeakTextCacheFileRepository speakTextCacheFileRepository;
     @Autowired
     private WordRepository wordRepository;
 
-    @Value("${google.tts.userjson}")
+    @Value("${google.tts.userjson:#{null}}")
     private String userjson;
 
     private TextToSpeechSettings settings;
 
     @PostConstruct
     public void init() throws IOException {
+
+        if (userjson == null) {
+            logger.warn("No google.tts.userjson defined. Will not be able to use Google TTS");
+            return;
+        }
 
         // Check if it is a file on the working directory
         InputStream userJsonStream;
@@ -65,6 +74,9 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
         // Find get the existing file
         var speakTextCacheFile = speakTextCacheFileRepository.findByCacheId(cacheId);
         if (speakTextCacheFile == null) {
+
+            AssertTools.assertNotNull(settings, "Google TTS is disabled");
+
             // Find the text to generate
             var word = wordRepository.findOneBySpeakTextCacheId(cacheId);
             if (word == null) {
@@ -80,6 +92,33 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
         }
 
         return new ByteArrayResource(speakTextCacheFile.getMp3Bytes());
+    }
+
+    @Override
+    public void cleanupSpeakTextCacheFile() {
+        logger.info("Cleanup SpeakTextCacheFile where cacheId is no more used by any Word");
+
+        TypedAggregation<SpeakTextCacheFile> aggregation = newAggregation(SpeakTextCacheFile.class,
+                lookup("word", "cacheId", "speakText.cacheId", "words"),
+                match(where("words").size(0)),
+                project("_id")
+        );
+        BufferBatchesTools.<String>autoClose(100,
+                idsToDelete -> {
+                    var deleteResult = mongoOperations.remove(new Query(where("id").in(idsToDelete)), SpeakTextCacheFile.class);
+                    logger.info("Deleted {} SpeakTextCacheFile", deleteResult.getDeletedCount());
+                },
+                list -> {
+                    try (var speakTextCacheFileCloseableIterator = mongoOperations.aggregateStream(aggregation, SpeakTextCacheFile.class)) {
+                        speakTextCacheFileCloseableIterator.forEachRemaining(speakTextCacheFile -> {
+                            logger.info("Will delete SpeakTextCacheFile {}", speakTextCacheFile.getId());
+                            list.add(speakTextCacheFile.getId());
+                        });
+                    }
+                }
+        );
+
+        logger.info("Cleanup SpeakTextCacheFile done");
     }
 
     private byte[] generateFile(Language language, String text) {

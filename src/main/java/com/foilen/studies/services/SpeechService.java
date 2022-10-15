@@ -4,4 +4,6 @@ import org.springframework.core.io.Resource;
 
 public interface SpeechService {
     Resource getFile(String cacheId);
+
+    void cleanupSpeakTextCacheFile();
 }

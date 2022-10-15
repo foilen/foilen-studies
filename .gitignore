@@ -37,6 +37,6 @@ out/
 .vscode/
 
 ### Local Config ###
-src/main/resources/application.yaml
-src/main/resources/google-service-account.json
 _*
+/application.properties
+/google-service-account.json
