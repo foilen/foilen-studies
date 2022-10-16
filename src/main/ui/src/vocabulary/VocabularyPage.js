@@ -35,6 +35,12 @@ function VocabularyPage() {
             if (!items) {
                 items = []
             }
+
+            items.push({
+                id: null,
+                name: 'Tous les mots',
+                wordIds: [],
+            })
             for (const item of items) {
                 item.choice = {
                     selected: false,
@@ -200,13 +206,16 @@ function VocabularyPage() {
                                        checked={wordList.choice.selected}
                                        onChange={() => toggleSelect(wordListIdx)}
                                 />
-                                {wordList.name} ({wordList.wordIds.length} mots)
+                                {wordList.name} {wordList.scores && <span>({wordList.scores.total} mots)</span>}
 
-                                <NavLink to={`/vocabulary/${wordList.id}`}
-                                         className="btn btn-outline-primary">Éditer</NavLink>
-                                <button className="btn btn-danger float-end"
-                                        onClick={() => deleteWordList(wordList)}>X
-                                </button>
+                                {wordList.id && <>
+                                    <NavLink to={`/vocabulary/${wordList.id}`}
+                                             className="btn btn-outline-primary">Éditer</NavLink>
+                                    <button className="btn btn-danger float-end"
+                                            onClick={() => deleteWordList(wordList)}>X
+                                    </button>
+                                </>
+                                }
 
                                 {wordList.choice.selected &&
                                     <>
@@ -264,14 +273,16 @@ function VocabularyPage() {
                                     </>
                                 }
 
-                                <div className="progress">
-                                    <div className="progress-bar bg-danger" role="progressbar"
-                                         style={{width: wordList.scores.badPercentage + '%'}}>{wordList.scores.bad}</div>
-                                    <div className="progress-bar bg-warning" role="progressbar"
-                                         style={{width: wordList.scores.averagePercentage + '%'}}>{wordList.scores.average}</div>
-                                    <div className="progress-bar bg-success" role="progressbar"
-                                         style={{width: wordList.scores.goodPercentage + '%'}}>{wordList.scores.good}</div>
-                                </div>
+                                {wordList.scores &&
+                                    <div className="progress">
+                                        <div className="progress-bar bg-danger" role="progressbar"
+                                             style={{width: wordList.scores.badPercentage + '%'}}>{wordList.scores.bad}</div>
+                                        <div className="progress-bar bg-warning" role="progressbar"
+                                             style={{width: wordList.scores.averagePercentage + '%'}}>{wordList.scores.average}</div>
+                                        <div className="progress-bar bg-success" role="progressbar"
+                                             style={{width: wordList.scores.goodPercentage + '%'}}>{wordList.scores.good}</div>
+                                    </div>
+                                }
 
                             </div>
                         )}

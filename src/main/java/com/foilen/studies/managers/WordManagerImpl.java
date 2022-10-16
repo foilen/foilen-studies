@@ -73,18 +73,31 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         var scoreByWordId = getOrCreateUserScores(userId).getScoreByWordId();
 
-        // TODO Support from any list (when wordListId == null)
-
         Set<String> selectedWordIds = new HashSet<>();
         form.getParameters().forEach(parameter -> {
-            var wordList = wordListRepository.findByIdAndOwnerUserId(parameter.getWordListId(), userId);
-            if (wordList != null) {
-                randomWordAddSomeIds(selectedWordIds, wordList, scoreByWordId, -1, parameter.getAnyScoreCount());
-                randomWordAddSomeIds(selectedWordIds, wordList, scoreByWordId, 0, parameter.getNoScoreCount());
-                randomWordAddSomeIds(selectedWordIds, wordList, scoreByWordId, 1, parameter.getBadScoreCount());
-                randomWordAddSomeIds(selectedWordIds, wordList, scoreByWordId, 2, parameter.getAverageScoreCount());
-                randomWordAddSomeIds(selectedWordIds, wordList, scoreByWordId, 3, parameter.getGoodScoreCount());
+            Collection<String> wordListIds;
+            String wordListId = parameter.getWordListId();
+
+            // Select from any list
+            if (wordListId == null) {
+                wordListIds = wordListRepository.findAllByOwnerUserId(userId).stream() //
+                        .flatMap(wordList -> wordList.getWordIds().stream()) //
+                        .collect(Collectors.toSet());
+            } else {
+                // Specific list
+                var wordList = wordListRepository.findByIdAndOwnerUserId(wordListId, userId);
+                if (wordList == null) {
+                    return;
+                } else {
+                    wordListIds = wordList.getWordIds();
+                }
             }
+
+            randomWordAddSomeIds(selectedWordIds, wordListIds, scoreByWordId, -1, parameter.getAnyScoreCount());
+            randomWordAddSomeIds(selectedWordIds, wordListIds, scoreByWordId, 0, parameter.getNoScoreCount());
+            randomWordAddSomeIds(selectedWordIds, wordListIds, scoreByWordId, 1, parameter.getBadScoreCount());
+            randomWordAddSomeIds(selectedWordIds, wordListIds, scoreByWordId, 2, parameter.getAverageScoreCount());
+            randomWordAddSomeIds(selectedWordIds, wordListIds, scoreByWordId, 3, parameter.getGoodScoreCount());
         });
         return StreamSupport.stream(wordRepository.findAllById(selectedWordIds).spliterator(), false)
                 .collect(Collectors.toList());
@@ -94,16 +107,16 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
      * Select some random words.
      *
      * @param selectedWordIds the list of all the selected words that will be populated
-     * @param wordList        the word list to pick words from
+     * @param wordListIds     the word ids to pick words from
      * @param scoreByWordId   the scores for each word
      * @param desiredScore    -1 for any ; 0 for no score ; >=1 as exact score
      * @param amount          the max amount of words to pick
      */
-    private void randomWordAddSomeIds(Set<String> selectedWordIds, WordList wordList, Map<String, Score> scoreByWordId, int desiredScore, int amount) {
+    private void randomWordAddSomeIds(Set<String> selectedWordIds, Collection<String> wordListIds, Map<String, Score> scoreByWordId, int desiredScore, int amount) {
         if (amount == 0) {
             return;
         }
-        Set<String> bucketWordIds = wordList.getWordIds().stream()
+        Set<String> bucketWordIds = wordListIds.stream()
                 .filter(wordId -> {
                     // Any
                     if (desiredScore == -1) {
