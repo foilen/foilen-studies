@@ -4,6 +4,7 @@ import lodash from "lodash";
 import playImage from "./play.png";
 import {NavLink} from "react-router-dom";
 import "./VocabularyPage.css"
+import {toast} from "react-toastify";
 
 function VocabularyPage() {
 
@@ -38,6 +39,10 @@ function VocabularyPage() {
                 item.choice = {
                     selected: false,
                     anyScoreCount: item.wordIds.length,
+                    noScoreCount: 0,
+                    badScoreCount: 0,
+                    averageScoreCount: 0,
+                    goodScoreCount: 0,
                 }
             }
             setWordLists(items)
@@ -60,9 +65,9 @@ function VocabularyPage() {
         }
     }
 
-    function changeAnyScoreCount(wordListIdx, value) {
+    function changeScoreCount(wordListIdx, fieldName, value) {
         let nextWordLists = [...wordLists]
-        wordLists[wordListIdx].choice.anyScoreCount = value
+        wordLists[wordListIdx].choice[fieldName] = value
         setWordLists(nextWordLists)
     }
 
@@ -72,12 +77,20 @@ function VocabularyPage() {
             parameters: selectedWordLists.map(wl => ({
                 wordListId: wl.id,
                 anyScoreCount: wl.choice.anyScoreCount,
+                noScoreCount: wl.choice.noScoreCount,
+                badScoreCount: wl.choice.badScoreCount,
+                averageScoreCount: wl.choice.averageScoreCount,
+                goodScoreCount: wl.choice.goodScoreCount,
             }))
         }
 
         // Get the random list
         autoRetry('Get Words', () => window.service.wordListRandom(form), 5000).then(response => {
-            startGame(response.data.items);
+            if (response.data.items) {
+                startGame(response.data.items);
+            } else {
+                toast.error("Aucun mot trouvé")
+            }
         })
     }
 
@@ -188,25 +201,76 @@ function VocabularyPage() {
                                        onChange={() => toggleSelect(wordListIdx)}
                                 />
                                 {wordList.name} ({wordList.wordIds.length} mots)
-                                {wordList.choice.selected &&
-                                    <input type="number"
-                                           value={wordList.choice.anyScoreCount}
-                                           onChange={e => changeAnyScoreCount(wordListIdx, e.target.value)}
-                                    />
-                                }
+
                                 <NavLink to={`/vocabulary/${wordList.id}`}
                                          className="btn btn-outline-primary">Éditer</NavLink>
                                 <button className="btn btn-danger float-end"
                                         onClick={() => deleteWordList(wordList)}>X
                                 </button>
 
+                                {wordList.choice.selected &&
+                                    <>
+                                        <div className="row">
+                                            <label className="col-form-label col">N'importe quel mot</label>
+                                            <div className="col">
+                                                <input type="number" className="form-control"
+                                                       value={wordList.choice.anyScoreCount}
+                                                       onChange={e => changeScoreCount(wordListIdx, 'anyScoreCount', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <label className="col-form-label col">Mot sans score</label>
+                                            <div className="col">
+                                                <input type="number" className="form-control"
+                                                       value={wordList.choice.noScoreCount}
+                                                       onChange={e => changeScoreCount(wordListIdx, 'noScoreCount', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="row">
+                                            <label className="col-form-label col">Mot avec un mauvais score</label>
+                                            <div className="col">
+                                                <input type="number" className="form-control"
+                                                       value={wordList.choice.badScoreCount}
+                                                       onChange={e => changeScoreCount(wordListIdx, 'badScoreCount', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+
+                                        <div className="row">
+                                            <label className="col-form-label col">Mot avec un score moyen</label>
+                                            <div className="col">
+                                                <input type="number" className="form-control"
+                                                       value={wordList.choice.averageScoreCount}
+                                                       onChange={e => changeScoreCount(wordListIdx, 'averageScoreCount', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+
+
+                                        <div className="row">
+                                            <label className="col-form-label col">Mot avec un bon score</label>
+                                            <div className="col">
+                                                <input type="number" className="form-control"
+                                                       value={wordList.choice.goodScoreCount}
+                                                       onChange={e => changeScoreCount(wordListIdx, 'goodScoreCount', e.target.value)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </>
+                                }
+
                                 <div className="progress">
                                     <div className="progress-bar bg-danger" role="progressbar"
-                                         style={{width: wordList.scores.badPercentage + '%'}}></div>
+                                         style={{width: wordList.scores.badPercentage + '%'}}>{wordList.scores.bad}</div>
                                     <div className="progress-bar bg-warning" role="progressbar"
-                                         style={{width: wordList.scores.averagePercentage + '%'}}></div>
+                                         style={{width: wordList.scores.averagePercentage + '%'}}>{wordList.scores.average}</div>
                                     <div className="progress-bar bg-success" role="progressbar"
-                                         style={{width: wordList.scores.goodPercentage + '%'}}></div>
+                                         style={{width: wordList.scores.goodPercentage + '%'}}>{wordList.scores.good}</div>
                                 </div>
 
                             </div>
