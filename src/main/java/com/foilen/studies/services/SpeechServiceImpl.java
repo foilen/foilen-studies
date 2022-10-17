@@ -78,7 +78,7 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
             AssertTools.assertNotNull(settings, "Google TTS is disabled");
 
             // Find the text to generate
-            var word = wordRepository.findOneBySpeakTextCacheId(cacheId);
+            var word = wordRepository.findFirstBySpeakTextCacheId(cacheId);
             if (word == null) {
                 throw new ResponseStatusException(NOT_FOUND, "No Word with that speech id");
             }
