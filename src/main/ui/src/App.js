@@ -10,6 +10,7 @@ import HomePage from "./home/HomePage";
 import VocabularyPage from "./vocabulary/VocabularyPage";
 import VocabularyEditPage from "./vocabulary/VocabularyEditPage";
 import Footer from "./layout/Footer";
+import GoogleAnalytics from "./common/GoogleAnalytics";
 
 function Page() {
     return <div className="Page"><Outlet/></div>;
@@ -45,6 +46,7 @@ function App() {
                 draggable
                 pauseOnHover
             />
+            <GoogleAnalytics/>
         </Router>
     );
 }

@@ -8,10 +8,13 @@ export class Service {
         })
     }
 
+    googleAnalyticsGet() {
+        return this.axiosInstance.get('/appDetails/googleAnalytics')
+    }
+
     userGet() {
         return this.axiosInstance.get('/user')
     }
-
     wordListList() {
         return this.axiosInstance.get('/wordList/')
     }
