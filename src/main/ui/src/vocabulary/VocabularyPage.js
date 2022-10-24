@@ -44,7 +44,7 @@ function VocabularyPage() {
             for (const item of items) {
                 item.choice = {
                     selected: false,
-                    anyScoreCount: item.wordIds.length,
+                    anyScoreCount: item.wordIds ? item.wordIds.length : 0,
                     noScoreCount: 0,
                     badScoreCount: 0,
                     averageScoreCount: 0,

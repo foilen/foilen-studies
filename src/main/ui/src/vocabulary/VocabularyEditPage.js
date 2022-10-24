@@ -17,6 +17,9 @@ function VocabularyEditPage() {
     useEffect(() => {
         if (wordListId) {
             failuresToToast('Get existing list', () => window.service.wordListGet(wordListId), false).then(response => {
+                if (!response.data.item.words) {
+                    response.data.item.words = []
+                }
                 setForm(response.data.item)
             })
         }
