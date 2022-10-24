@@ -22,6 +22,7 @@ dependencies {
     implementation 'com.foilen:jl-smalltools-mongodb:2.2.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.session:spring-session-data-mongodb'
 
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
