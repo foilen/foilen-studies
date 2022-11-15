@@ -329,7 +329,8 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         return userScores;
     }
 
-    private static final Set<Character> separators = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' '));
+    private static final Set<Character> separators = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' ', '+', '*', '\\', '|', ';', '!', '?','(',')'));
+    private static final Map<Character,Character> replacements = Map.of('`','\'');
 
     static protected List<String> tokenize(String wordsInText) {
 
@@ -340,6 +341,9 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
             // Next word
             var ch = wordsInText.charAt(i);
+            if (replacements.containsKey(ch)) {
+                ch = replacements.get(ch);
+            }
             if (separators.contains(ch)) {
                 if (!nextWord.isEmpty()) {
                     words.add(nextWord.toString().toLowerCase());

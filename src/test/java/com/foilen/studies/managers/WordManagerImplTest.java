@@ -14,9 +14,15 @@ class WordManagerImplTest {
                 fourth/fifth. sixth
                                 
                 super-high,fifth,FIFTH,École
+                aujourd'hui, aujourd`hui
+                hard* (abc)def/ghi\\jkl|mno+pqr;stu!vwx?yz
                 """;
         AssertTools.assertJsonComparison(
-                Arrays.asList("first", "second", "third", "fourth", "fifth", "sixth", "super-high", "école"),
+                Arrays.asList("first", "second", "third",
+                        "fourth", "fifth", "sixth",
+                        "super-high", "école",
+                        "aujourd'hui",
+                        "hard", "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz"),
                 WordManagerImpl.tokenize(wordsInText)
         );
     }
