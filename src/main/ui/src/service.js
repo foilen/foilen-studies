@@ -15,6 +15,9 @@ export class Service {
     userGet() {
         return this.axiosInstance.get('/user')
     }
+    userIsLoggedIn() {
+        return this.axiosInstance.get('/user/isLoggedIn')
+    }
     wordListList() {
         return this.axiosInstance.get('/wordList/')
     }

@@ -24,7 +24,12 @@ public class SpringSecurityConfig {
 
         http.csrf().csrfTokenRepository(cookieCsrfTokenRepository());
 
-        http.authorizeRequests((requests) -> requests.anyRequest().authenticated());
+        http.authorizeRequests((requests) -> requests
+                .antMatchers("/").permitAll()
+                .antMatchers("/js/**").permitAll()
+                .mvcMatchers("/appDetails/**").permitAll()
+                .mvcMatchers("/user/isLoggedIn").permitAll()
+                .anyRequest().authenticated());
         http.oauth2Login(Customizer.withDefaults());
         http.oauth2Client();
 
