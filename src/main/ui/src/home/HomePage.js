@@ -34,6 +34,38 @@ function HomePage() {
             <div className="col col-sm-8 col-md-5 col-xl-4 col-xxl-3">
                 <div className="card">
                     <div className="card-body">
+                        <h5 className="card-title">Présentation du module de vocabulaire (1 min)</h5>
+                        <p className="card-text">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/4IDzIyXSKwA"
+                                    title="YouTube video player" frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen></iframe>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div className="row">
+            <div className="col col-sm-8 col-md-5 col-xl-4 col-xxl-3">
+                <div className="card">
+                    <div className="card-body">
+                        <h5 className="card-title">Module de vocabulaire (11 min)</h5>
+                        <p className="card-text">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/gMr52iWrY38"
+                                    title="YouTube video player" frameBorder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen></iframe>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div className="row">
+            <div className="col col-sm-8 col-md-5 col-xl-4 col-xxl-3">
+                <div className="card">
+                    <div className="card-body">
                         <h5 className="card-title">Logiciel libre</h5>
                         <p className="card-text">
                             <img src={githubImage} className="float-end" alt="GitHub"/>
