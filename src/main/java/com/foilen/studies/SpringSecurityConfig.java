@@ -27,6 +27,7 @@ public class SpringSecurityConfig {
         http.authorizeRequests((requests) -> requests
                 .antMatchers("/").permitAll()
                 .antMatchers("/js/**").permitAll()
+                .antMatchers("/static/**").permitAll()
                 .mvcMatchers("/appDetails/**").permitAll()
                 .mvcMatchers("/user/isLoggedIn").permitAll()
                 .anyRequest().authenticated());
