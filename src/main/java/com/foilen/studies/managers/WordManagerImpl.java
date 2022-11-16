@@ -36,11 +36,11 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     private WordListRepository wordListRepository;
 
     @Override
-    public List<Word> bulkSplit(String userId, String wordsInText) {
+    public List<Word> bulkSplit(String userId, String wordsInText, boolean acceptSpacesInWords) {
 
         logger.info("User {} is getting words in bulk", userId);
 
-        var wordNames = tokenize(wordsInText);
+        var wordNames = tokenize(wordsInText, acceptSpacesInWords);
         logger.info("Will have {} words", wordNames.size());
 
         // Get the words already created by me
@@ -329,10 +329,13 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         return userScores;
     }
 
-    private static final Set<Character> separators = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' ', '+', '*', '\\', '|', ';', '!', '?','(',')'));
-    private static final Map<Character,Character> replacements = Map.of('`','\'');
+    private static final Set<Character> SEPARATORS = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', '+', '*', '\\', '|', ';', '!', '?', '(', ')'));
+    private static final Set<Character> SEPARATORS_WITH_SPACE = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' ', '+', '*', '\\', '|', ';', '!', '?', '(', ')'));
+    private static final Map<Character, Character> replacements = Map.of('`', '\'');
 
-    static protected List<String> tokenize(String wordsInText) {
+    static protected List<String> tokenize(String wordsInText, boolean acceptSpacesInWords) {
+
+        Set<Character> separators = acceptSpacesInWords ? SEPARATORS : SEPARATORS_WITH_SPACE;
 
         Set<String> words = new LinkedHashSet<>();
 
@@ -344,9 +347,10 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
             if (replacements.containsKey(ch)) {
                 ch = replacements.get(ch);
             }
+
             if (separators.contains(ch)) {
                 if (!nextWord.isEmpty()) {
-                    words.add(nextWord.toString().toLowerCase());
+                    words.add(nextWord.toString().toLowerCase().trim());
                 }
                 nextWord = new StringBuilder();
             } else {
@@ -357,7 +361,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         // Last word
         if (!nextWord.isEmpty()) {
-            words.add(nextWord.toString().toLowerCase());
+            words.add(nextWord.toString().toLowerCase().trim());
         }
 
         return new ArrayList<>(words);

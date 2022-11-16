@@ -8,7 +8,7 @@ import java.util.Arrays;
 class WordManagerImplTest {
 
     @Test
-    void tokenize() {
+    void tokenizeWithSpaceAsSeparator() {
         var wordsInText = """
                 first,second, third
                 fourth/fifth. sixth
@@ -23,7 +23,20 @@ class WordManagerImplTest {
                         "super-high", "école",
                         "aujourd'hui",
                         "hard", "abc", "def", "ghi", "jkl", "mno", "pqr", "stu", "vwx", "yz"),
-                WordManagerImpl.tokenize(wordsInText)
+                WordManagerImpl.tokenize(wordsInText, false)
+        );
+    }
+
+    @Test
+    void tokenizeAcceptSpacesInWords() {
+        var wordsInText = """
+                froide, froid
+                parce que, joie
+                """;
+        AssertTools.assertJsonComparison(
+                Arrays.asList("froide", "froid",
+                        "parce que", "joie"),
+                WordManagerImpl.tokenize(wordsInText, true)
         );
     }
 }

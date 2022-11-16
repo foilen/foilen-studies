@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface WordManager {
 
-    List<Word> bulkSplit(String userId, String wordsInText);
+    List<Word> bulkSplit(String userId, String wordsInText, boolean acceptSpacesInWords);
 
     List<Word> randomWord(String userId, RandomWordListForm form);
 

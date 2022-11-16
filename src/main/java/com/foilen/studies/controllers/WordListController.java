@@ -65,7 +65,7 @@ public class WordListController {
         var userDetails = userManager.getOrCreateUser(authentication);
 
         var result = new WordListResult();
-        result.setItems(wordManager.bulkSplit(userDetails.getId(), form.getAll()));
+        result.setItems(wordManager.bulkSplit(userDetails.getId(), form.getAll(), form.isAcceptSpacesInWords()));
         return result;
     }
 

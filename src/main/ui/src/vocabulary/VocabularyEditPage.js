@@ -1,6 +1,6 @@
 import {NavLink, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
-import {updateFormValue} from "../common/Forms";
+import {toggleCheckbox, updateFormValue} from "../common/Forms";
 import {autoRetry, failuresToToast} from "../service";
 import WordItem from "./WordItem";
 import {unique} from "../common/ArrayUtils";
@@ -27,12 +27,13 @@ function VocabularyEditPage() {
 
     const [bulkForm, setBulkForm] = useState({
         all: '',
+        acceptSpacesInWords: false,
     })
 
     function bulkAdd() {
         autoRetry('Bulk split', () => window.service.wordListBulkSplit(bulkForm), 5000).then(response => {
             addWords(response.data.items)
-            setBulkForm({all: ''})
+            setBulkForm({...bulkForm, all: ''})
         })
     }
 
@@ -77,6 +78,15 @@ function VocabularyEditPage() {
                 <p className="text-bg-info">Vous pouvez coller une liste de mots séparés par des espaces, des virgules,
                     des points et des retours de lignes et ce, tout en même temps. Les mots seront ensuite séparés et
                     gérables.</p>
+
+                <div className="form-check">
+                <input className="form-check-input" type="checkbox"
+                       checked={bulkForm.acceptSpacesInWords}
+                       onChange={() => toggleCheckbox(bulkForm, setBulkForm, 'acceptSpacesInWords')}/>
+                    <label className="form-check-label">
+                        Accepter les espaces dans les mots (ex: "parce que")
+                    </label>
+                </div>
 
                 <textarea className="form-control" rows="10"
                           name="all"

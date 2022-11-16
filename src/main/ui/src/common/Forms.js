@@ -47,6 +47,16 @@ export function setFormValue(form, setForm, fieldName, newValue, callback) {
     }
 }
 
+export function toggleCheckbox(form, setForm, fieldName, callback) {
+    let newForm = {...form}
+    newForm[fieldName] = !newForm[fieldName]
+    setForm(newForm)
+
+    if (callback) {
+        callback()
+    }
+}
+
 export function updateFormValue(event, form, setForm) {
     const target = event.target
     const value = target.type === 'checkbox' ? target.checked : target.value
