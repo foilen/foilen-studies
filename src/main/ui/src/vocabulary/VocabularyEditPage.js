@@ -32,6 +32,7 @@ function VocabularyEditPage() {
     function bulkAdd() {
         autoRetry('Bulk split', () => window.service.wordListBulkSplit(bulkForm), 5000).then(response => {
             addWords(response.data.items)
+            setBulkForm({all: ''})
         })
     }
 
@@ -56,6 +57,13 @@ function VocabularyEditPage() {
     }
 
     function save() {
+        // Check if the bulk form still have data in it and confirm if so
+        if (bulkForm.all) {
+            if (!window.confirm('Vous avez des mots non-ajoutés dans le champ du haut. Êtes-vous sûr de vouloir sauvegarder la liste sans ajouter ces mots?')) {
+                return
+            }
+        }
+
         failuresToToast('Save', () => window.service.wordListSave(form)).then(() => {
             window.location = '#/vocabulary'
         })
@@ -72,6 +80,7 @@ function VocabularyEditPage() {
 
                 <textarea className="form-control" rows="10"
                           name="all"
+                          value={bulkForm.all}
                           onChange={e => updateFormValue(e, bulkForm, setBulkForm)}
                 ></textarea>
 
