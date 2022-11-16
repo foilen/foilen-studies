@@ -1,4 +1,5 @@
 import React from "react";
+import emailImage from "./email.png";
 import githubImage from "./github.png";
 
 function HomePage() {
@@ -41,6 +42,22 @@ function HomePage() {
                         </p>
                         <a href="https://github.com/foilen/foilen-studies" className="btn btn-primary"
                            target="_blank">GitHub</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div className="row">
+            <div className="col col-sm-8 col-md-5 col-xl-4 col-xxl-3">
+                <div className="card">
+                    <div className="card-body">
+                        <h5 className="card-title">Contacter</h5>
+                        <p className="card-text">
+                            <img src={emailImage} className="float-end" alt="Courriel"/>
+                            Si vous avez des questions, des problèmes ou des suggestions, n'hésitez pas à me contacter.
+                        </p>
+                        <a href="mailto:simon@foilen.com?subject=Foilen études" className="btn btn-primary"
+                           target="_blank">Courriel</a>
                     </div>
                 </div>
             </div>
