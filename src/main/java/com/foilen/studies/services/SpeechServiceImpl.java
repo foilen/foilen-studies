@@ -2,8 +2,10 @@ package com.foilen.studies.services;
 
 import com.foilen.smalltools.tools.*;
 import com.foilen.studies.data.SpeakTextCacheFileRepository;
+import com.foilen.studies.data.VerbRepository;
 import com.foilen.studies.data.WordRepository;
 import com.foilen.studies.data.vocabulary.Language;
+import com.foilen.studies.data.vocabulary.SpeakText;
 import com.foilen.studies.data.vocabulary.SpeakTextCacheFile;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.ServiceAccountCredentials;
@@ -35,6 +37,8 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
     private MongoOperations mongoOperations;
     @Autowired
     private SpeakTextCacheFileRepository speakTextCacheFileRepository;
+    @Autowired
+    private VerbRepository verbRepository;
     @Autowired
     private WordRepository wordRepository;
 
@@ -78,13 +82,22 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
             AssertTools.assertNotNull(settings, "Google TTS is disabled");
 
             // Find the text to generate
+            SpeakText speakText = null;
             var word = wordRepository.findFirstBySpeakTextCacheId(cacheId);
             if (word == null) {
-                throw new ResponseStatusException(NOT_FOUND, "No Word with that speech id");
+                var verb = verbRepository.findFirstByVerbLinesSpeakTextCacheId(cacheId);
+                if (verb != null) {
+                    speakText = verb.getVerbLines().stream().filter(v -> v.getSpeakText().getCacheId().equals(cacheId)).findFirst().get().getSpeakText();
+                }
+            } else {
+                speakText = word.getSpeakText();
+            }
+            if (speakText == null) {
+                throw new ResponseStatusException(NOT_FOUND, "No Word or Verb with that speech id");
             }
 
             // Generate
-            var fileContent = generateFile(word.getSpeakText().getLanguage(), word.getSpeakText().getText());
+            var fileContent = generateFile(speakText.getLanguage(), speakText.getText());
             speakTextCacheFile = new SpeakTextCacheFile();
             speakTextCacheFile.setCacheId(cacheId);
             speakTextCacheFile.setMp3Bytes(fileContent);

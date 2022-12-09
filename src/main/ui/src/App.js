@@ -9,6 +9,8 @@ import Header from './layout/Header.js';
 import HomePage from "./home/HomePage";
 import VocabularyPage from "./vocabulary/VocabularyPage";
 import VocabularyEditPage from "./vocabulary/VocabularyEditPage";
+import VerbPage from "./verb/VerbPage";
+import VerbEditPage from "./verb/VerbEditPage";
 import Footer from "./layout/Footer";
 import GoogleAnalytics from "./common/GoogleAnalytics";
 
@@ -29,6 +31,11 @@ function App() {
                                 <Route path="" element={<VocabularyPage/>}/>
                                 <Route path="create" element={<VocabularyEditPage/>}/>
                                 <Route path=":wordListId" element={<VocabularyEditPage/>}/>
+                            </Route>
+                            <Route path="verb/">
+                                <Route path="" element={<VerbPage/>}/>
+                                <Route path="create" element={<VerbEditPage/>}/>
+                                <Route path=":verbId" element={<VerbEditPage/>}/>
                             </Route>
                         </Route>
                     </Routes>

@@ -18,6 +18,20 @@ export class Service {
     userIsLoggedIn() {
         return this.axiosInstance.get('/user/isLoggedIn')
     }
+
+    verbList() {
+        return this.axiosInstance.get('/verb/')
+    }
+    verbGet(verbId) {
+        return this.axiosInstance.get(`/verb/${verbId}`)
+    }
+    verbSave(form) {
+        return this.axiosInstance.post(`/verb/`, form)
+    }
+    verbDelete(verbId) {
+        return this.axiosInstance.delete(`/verb/${verbId}`)
+    }
+
     wordListList() {
         return this.axiosInstance.get('/wordList/')
     }
@@ -39,6 +53,7 @@ export class Service {
     wordListTrack(form) {
         return this.axiosInstance.post('/wordList/track', form)
     }
+
 }
 
 export function autoRetry(context, promiseProvider, delayInSec) {

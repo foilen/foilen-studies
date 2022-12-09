@@ -118,6 +118,11 @@ function AskWordsSection(props) {
                             </div>
                             <hr/>
                             <div className="row">
+
+                                {wordToFind.prefix && <div className="col-1">
+                                    {wordToFind.prefix}
+                                </div>}
+
                                 <div className="col-10">
                                     <input type="text" className="form-control"
                                            autoComplete="off"
@@ -126,6 +131,7 @@ function AskWordsSection(props) {
                                            onChange={(e) => updateAnswer(e, userAnswer, setUserAnswer)}
                                     />
                                 </div>
+
                                 <div className="col-1">
                                     <button className="btn btn-primary"
                                             disabled={transition}
