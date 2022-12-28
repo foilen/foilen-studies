@@ -1,9 +1,11 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.4'
-    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id "com.github.ben-manes.versions" version "0.44.0"
+
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
 
-    id 'com.github.node-gradle.node' version '3.4.0'
+    id 'com.github.node-gradle.node' version '3.5.1'
 }
 
 group = 'com.foilen'
@@ -15,11 +17,11 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "4.4.0")
+    set('springCloudAzureVersion', "4.5.0")
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-mongodb:2.2.0'
+    implementation 'com.foilen:jl-smalltools-mongodb:2.3.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.session:spring-session-data-mongodb'
@@ -32,7 +34,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // Text to speech
-    implementation platform('com.google.cloud:libraries-bom:26.1.2')
+    implementation platform('com.google.cloud:libraries-bom:26.2.0')
     implementation 'com.google.cloud:google-cloud-texttospeech'
     implementation 'com.google.auth:google-auth-library-oauth2-http'
 
@@ -59,7 +61,7 @@ tasks.named('test') {
 // NodeJS
 node {
     download = true
-    nodeProjectDir = file("${project.projectDir}/src/main/ui")
+    nodeProjectDir = file("${project.projectDir}/src/main/ui") as Directory
 }
 
 task copyNodeBuildFiles(type: Copy) {

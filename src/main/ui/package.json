@@ -3,25 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "@jagannathbhat/cra-build-watch": "^1.0.1"
+    "@jagannathbhat/cra-build-watch": "^1"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.6",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^14.4.3",
-    "axios": "^0.27.2",
-    "bootstrap": "^5.2.1",
-    "bootstrap-icons": "^1.9.1",
-    "jquery": "^3.6.1",
-    "lodash": "^4.17.21",
-    "luxon": "^2.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.4.1",
-    "react-scripts": "^5.0.1",
-    "react-toastify": "^9.0.8",
-    "web-vitals": "^3.0.2"
+    "@popperjs/core": "^2",
+    "@testing-library/jest-dom": "^5",
+    "@testing-library/react": "^13",
+    "@testing-library/user-event": "^14",
+    "axios": "^0",
+    "bootstrap": "^5",
+    "bootstrap-icons": "^1",
+    "jquery": "^3",
+    "lodash": "^4",
+    "luxon": "^2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-router-dom": "^6",
+    "react-scripts": "^5",
+    "react-toastify": "^9",
+    "web-vitals": "^3"
   },
   "scripts": {
     "start": "node node_modules/react-scripts/bin/react-scripts start",
