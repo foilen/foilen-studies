@@ -1,11 +1,11 @@
 plugins {
-    id "com.github.ben-manes.versions" version "0.44.0"
+    id "com.github.ben-manes.versions" version "0.47.0"
 
-    id 'org.springframework.boot' version '2.7.7'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.springframework.boot' version '3.1.3'
+    id 'io.spring.dependency-management' version '1.1.3'
     id 'java'
 
-    id 'com.github.node-gradle.node' version '3.5.1'
+    id 'com.github.node-gradle.node' version '7.0.0'
 }
 
 group = 'com.foilen'
@@ -17,11 +17,11 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "4.5.0")
+    set('springCloudAzureVersion', "5.5.0")
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-mongodb:2.3.0'
+    implementation 'com.foilen:jl-smalltools-mongodb:3.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.session:spring-session-data-mongodb'
@@ -34,12 +34,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // Text to speech
-    implementation platform('com.google.cloud:libraries-bom:26.2.0')
+    implementation platform('com.google.cloud:libraries-bom:26.22.0')
     implementation 'com.google.cloud:google-cloud-texttospeech'
     implementation 'com.google.auth:google-auth-library-oauth2-http'
 
     // Test
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.9.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
@@ -61,7 +61,7 @@ tasks.named('test') {
 // NodeJS
 node {
     download = true
-    nodeProjectDir = file("${project.projectDir}/src/main/ui") as Directory
+    nodeProjectDir = file("${project.projectDir}/src/main/ui")
 }
 
 task copyNodeBuildFiles(type: Copy) {
@@ -71,7 +71,7 @@ task copyNodeBuildFiles(type: Copy) {
 
 // npmInstall -> npm_run_build -> copyNodeBuildFiles
 tasks.bootJar.dependsOn copyNodeBuildFiles
-tasks.assemble.dependsOn copyNodeBuildFiles
+tasks.compileJava.dependsOn copyNodeBuildFiles
 tasks.copyNodeBuildFiles.dependsOn tasks.npm_run_build
 tasks.npm_run_build.dependsOn tasks.npmInstall
 

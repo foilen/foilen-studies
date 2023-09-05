@@ -22,15 +22,22 @@ public class SpringSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf().csrfTokenRepository(cookieCsrfTokenRepository());
+        http.csrf()
+                .csrfTokenRepository(cookieCsrfTokenRepository())
+                .csrfTokenRequestHandler((request, response, supplier) -> {
+            String token = request.getHeader("X-XSRF-TOKEN");
+            if (token != null) {
+                request.setAttribute("_csrf", token);
+            }
+        });
 
-        http.authorizeRequests((requests) -> requests
-                .antMatchers("/").permitAll()
-                .antMatchers("/js/**").permitAll()
-                .antMatchers("/static/**").permitAll()
-                .mvcMatchers("/appDetails/**").permitAll()
-                .mvcMatchers("/user/isLoggedIn").permitAll()
-                .anyRequest().authenticated());
+        http.authorizeHttpRequests()
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/js/**").permitAll()
+                .requestMatchers("/static/**").permitAll()
+                .requestMatchers("/appDetails/**").permitAll()
+                .requestMatchers("/user/isLoggedIn").permitAll()
+                .anyRequest().authenticated();
         http.oauth2Login(Customizer.withDefaults());
         http.oauth2Client();
 

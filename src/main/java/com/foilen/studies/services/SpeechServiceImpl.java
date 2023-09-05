@@ -123,7 +123,7 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
                 },
                 list -> {
                     try (var speakTextCacheFileCloseableIterator = mongoOperations.aggregateStream(aggregation, SpeakTextCacheFile.class)) {
-                        speakTextCacheFileCloseableIterator.forEachRemaining(speakTextCacheFile -> {
+                        speakTextCacheFileCloseableIterator.forEach(speakTextCacheFile -> {
                             logger.info("Will delete SpeakTextCacheFile {}", speakTextCacheFile.getId());
                             list.add(speakTextCacheFile.getId());
                         });
