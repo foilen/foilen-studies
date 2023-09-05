@@ -145,7 +145,7 @@ public class SpeechServiceImpl extends AbstractBasics implements SpeechService {
 
             VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
                     .setLanguageCode(languageCode)
-                    .setSsmlGender(SsmlVoiceGender.NEUTRAL)
+                    .setSsmlGender(SsmlVoiceGender.FEMALE)
                     .build();
             AudioConfig audioConfig = AudioConfig.newBuilder().setAudioEncoding(AudioEncoding.MP3).build();
             SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice, audioConfig);
