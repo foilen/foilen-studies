@@ -14,32 +14,31 @@ public class SpringSecurityConfig {
 
     @Bean
     public CookieCsrfTokenRepository cookieCsrfTokenRepository() {
-        var csrfTokenRepository = new CookieCsrfTokenRepository();
-        csrfTokenRepository.setCookieHttpOnly(false);
-        return csrfTokenRepository;
+        return CookieCsrfTokenRepository.withHttpOnlyFalse();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf()
+        http.csrf(csrf -> csrf
                 .csrfTokenRepository(cookieCsrfTokenRepository())
                 .csrfTokenRequestHandler((request, response, supplier) -> {
-            String token = request.getHeader("X-XSRF-TOKEN");
-            if (token != null) {
-                request.setAttribute("_csrf", token);
-            }
-        });
+                    String token = request.getHeader("X-XSRF-TOKEN");
+                    if (token != null) {
+                        request.setAttribute("_csrf", token);
+                    }
+                }));
 
-        http.authorizeHttpRequests()
+        http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/js/**").permitAll()
                 .requestMatchers("/static/**").permitAll()
                 .requestMatchers("/appDetails/**").permitAll()
                 .requestMatchers("/user/isLoggedIn").permitAll()
-                .anyRequest().authenticated();
+                .anyRequest().authenticated()
+        );
         http.oauth2Login(Customizer.withDefaults());
-        http.oauth2Client();
+        http.oauth2Client(oauth2 -> {});
 
         return http.build();
     }
