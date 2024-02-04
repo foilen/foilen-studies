@@ -4,7 +4,7 @@ import {autoRetry} from "../service";
 function GoogleAnalytics() {
 
     useEffect(() => {
-        autoRetry('Get Google Analytics id', () => window.service.googleAnalyticsGet(), 5000).then(response => {
+        autoRetry('Get Google Analytics id', () => window.service.googleAnalyticsGet(), 5).then(response => {
             let googleAnalyticsId = response.data.item
             if (googleAnalyticsId) {
                 console.log('Configure Google Analytics with id: ' + googleAnalyticsId)

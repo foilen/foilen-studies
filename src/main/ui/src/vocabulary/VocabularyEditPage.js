@@ -31,7 +31,7 @@ function VocabularyEditPage() {
     })
 
     function bulkAdd() {
-        autoRetry('Bulk split', () => window.service.wordListBulkSplit(bulkForm), 5000).then(response => {
+        autoRetry('Bulk split', () => window.service.wordListBulkSplit(bulkForm), 5).then(response => {
             addWords(response.data.items)
             setBulkForm({...bulkForm, all: ''})
         })
@@ -80,9 +80,9 @@ function VocabularyEditPage() {
                     gérables.</p>
 
                 <div className="form-check">
-                <input className="form-check-input" type="checkbox"
-                       checked={bulkForm.acceptSpacesInWords}
-                       onChange={() => toggleCheckbox(bulkForm, setBulkForm, 'acceptSpacesInWords')}/>
+                    <input className="form-check-input" type="checkbox"
+                           checked={bulkForm.acceptSpacesInWords}
+                           onChange={() => toggleCheckbox(bulkForm, setBulkForm, 'acceptSpacesInWords')}/>
                     <label className="form-check-label">
                         Accepter les espaces dans les mots (ex: "parce que")
                     </label>

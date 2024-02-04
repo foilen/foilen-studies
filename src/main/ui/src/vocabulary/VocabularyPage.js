@@ -18,7 +18,7 @@ function VocabularyPage() {
     const [finalScore, setFinalScore] = useState(null)
 
     useEffect(() => {
-        autoRetry('Get Word Lists', () => window.service.wordListList(), 5000).then(response => {
+        autoRetry('Get Word Lists', () => window.service.wordListList(), 5).then(response => {
             let items = response.data.items
             if (!items) {
                 items = []
@@ -51,7 +51,7 @@ function VocabularyPage() {
 
     function deleteWordList(wordList) {
         if (window.confirm(`Êtes-vous sûr de vouloir effacer la liste ${wordList.name}?`)) {
-            autoRetry('Delete Word List', () => window.service.wordListDelete(wordList.id), 5000).then(() => {
+            autoRetry('Delete Word List', () => window.service.wordListDelete(wordList.id), 5).then(() => {
                 let nextWordLists = [...wordLists]
                 lodash.remove(nextWordLists, {id: wordList.id})
                 setWordLists(nextWordLists)
@@ -79,7 +79,7 @@ function VocabularyPage() {
         }
 
         // Get the random list
-        autoRetry('Get Words', () => window.service.wordListRandom(form), 5000).then(response => {
+        autoRetry('Get Words', () => window.service.wordListRandom(form), 5).then(response => {
             if (response.data.items) {
                 startGame(response.data.items);
             } else {
@@ -103,7 +103,7 @@ function VocabularyPage() {
         }
 
         // Send tracking
-        autoRetry('Send tracking', () => window.service.wordListTrack(trackForm), 5000)
+        autoRetry('Send tracking', () => window.service.wordListTrack(trackForm), 5)
     }
 
     function onCompletion(gameFinalScore) {

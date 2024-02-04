@@ -22,6 +22,9 @@ function Header() {
                         <li className="nav-item">
                             <NavLink to="/verb" className="nav-link">Verbe</NavLink>
                         </li>
+                        <li className="nav-item">
+                            <NavLink to="/multiplication" className="nav-link">Multiplication</NavLink>
+                        </li>
                     </ul>
                 </div>
             </div>

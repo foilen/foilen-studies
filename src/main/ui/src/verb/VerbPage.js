@@ -16,7 +16,7 @@ function VerbPage() {
     const [finalScore, setFinalScore] = useState(null)
 
     useEffect(() => {
-        autoRetry('Get Verbs', () => window.service.verbList(), 5000).then(response => {
+        autoRetry('Get Verbs', () => window.service.verbList(), 5).then(response => {
             let items = response.data.items
             if (!items) {
                 items = []
@@ -28,7 +28,7 @@ function VerbPage() {
 
     function deleteVerb(verb) {
         if (window.confirm(`Êtes-vous sûr de vouloir effacer le verbe ${verb.name}?`)) {
-            autoRetry('Delete Verb', () => window.service.verbDelete(verb.id), 5000).then(() => {
+            autoRetry('Delete Verb', () => window.service.verbDelete(verb.id), 5).then(() => {
                 let nextVerbs = [...verbs]
                 lodash.remove(nextVerbs, {id: verb.id})
                 setVerbs(nextVerbs)

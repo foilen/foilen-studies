@@ -13,6 +13,7 @@ import VerbPage from "./verb/VerbPage";
 import VerbEditPage from "./verb/VerbEditPage";
 import Footer from "./layout/Footer";
 import GoogleAnalytics from "./common/GoogleAnalytics";
+import MultiplicationPage from "./multiplication/MultiplicationPage";
 
 function Page() {
     return <div className="Page"><Outlet/></div>;
@@ -37,6 +38,7 @@ function App() {
                                 <Route path="create" element={<VerbEditPage/>}/>
                                 <Route path=":verbId" element={<VerbEditPage/>}/>
                             </Route>
+                            <Route path="multiplication" element={<MultiplicationPage/>}/>
                         </Route>
                     </Routes>
                     <Footer/>
