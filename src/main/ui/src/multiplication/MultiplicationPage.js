@@ -227,6 +227,16 @@ function MultiplicationPage() {
                     </div>
                     <div className="row">
                         <div className="col-12">
+                            <div className="progress">
+                                <div className="progress-bar bg-danger" role="progressbar"
+                                     style={{width: score.fails * 100 / score.total + '%'}}>{score.fails}</div>
+                                <div className="progress-bar bg-success" role="progressbar"
+                                     style={{width: score.success * 100 / score.total + '%'}}>{score.success}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12">
                             {statusSuccess !== null &&
                                 <p className={`${statusSuccess ? 'text-success' : 'text-danger'}`}>{statusMessage}</p>}
 
@@ -235,15 +245,6 @@ function MultiplicationPage() {
                                     onClick={e => onAnswer()}
                             >Suivant
                             </button>
-                        </div>
-                    </div>
-                    { /* Show the progression */}
-                    <div className="row">
-                        <div className="col-12">
-                            Progression:
-                            <span className="text-bg-success">{score.success}</span> ;
-                            <span className="text-bg-danger">{score.fails}</span> ;
-                            {score.success + score.fails} / {score.total}
                         </div>
                     </div>
                 </>}
