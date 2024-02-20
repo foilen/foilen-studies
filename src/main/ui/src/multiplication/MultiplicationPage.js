@@ -23,6 +23,12 @@ function MultiplicationPage() {
     const [statusSuccess, setStatusSuccess] = useState(null)
     const [statusMessage, setStatusMessage] = useState("")
 
+    const [score, setScore] = useState({
+        success: 0,
+        fails: 0,
+        total: 0,
+    })
+
     useEffect(() => {
         refreshScores()
     }, [])
@@ -54,6 +60,11 @@ function MultiplicationPage() {
     }
 
     function startGame() {
+        setScore({
+            success: 0,
+            fails: 0,
+            total: randomForm.amount,
+        })
         failuresToToast('Get Questions', () => window.service.multiplicationRandom(randomForm), false).then(response => {
             if (response.data.success) {
                 setQuestions(response.data.questions)
@@ -103,6 +114,11 @@ function MultiplicationPage() {
         // Show good or bad during 3 seconds
         setStatusSuccess(correct)
         setStatusMessage(correct ? "Bravo!" : `La réponse était ${correctAnswer}`)
+        setScore(prevState => ({
+            ...prevState,
+            success: correct ? prevState.success + 1 : prevState.success,
+            fails: correct ? prevState.fails : prevState.fails + 1,
+        }))
         setTimeout(() => {
             goToNextQuestion(nextQuestion + 1)
         }, correct ? 1000 : 3000)
@@ -219,6 +235,15 @@ function MultiplicationPage() {
                                     onClick={e => onAnswer()}
                             >Suivant
                             </button>
+                        </div>
+                    </div>
+                    { /* Show the progression */}
+                    <div className="row">
+                        <div className="col-12">
+                            Progression:
+                            <span className="text-bg-success">{score.success}</span> ;
+                            <span className="text-bg-danger">{score.fails}</span> ;
+                            {score.success + score.fails} / {score.total}
                         </div>
                     </div>
                 </>}
