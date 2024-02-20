@@ -37,17 +37,18 @@ function MultiplicationPage() {
 
     function updateFormValueAndCalculateAmount(e) {
         let newForm = updateFormValue(e, randomForm, setRandomForm)
+        const leftMaxInt = parseInt(newForm.leftMax)
+        const rightMaxInt = parseInt(newForm.rightMax)
+        let smallest = leftMaxInt < rightMaxInt ? leftMaxInt : rightMaxInt
+        let biggest = leftMaxInt > rightMaxInt ? leftMaxInt : rightMaxInt
         if (newForm.leftAlwaysSmaller) {
-            const leftMaxInt = parseInt(newForm.leftMax)
-            const rightMaxInt = parseInt(newForm.rightMax)
-            let smallest = leftMaxInt < rightMaxInt ? leftMaxInt : rightMaxInt
             let all = newForm.leftMax * newForm.rightMax
             for (let i = 2; i <= smallest; i++) {
                 all -= (i - 1)
             }
             newForm.amount = all
         } else {
-            newForm.amount = newForm.leftMax * newForm.rightMax
+            newForm.amount = smallest * biggest + (biggest - smallest) * smallest
         }
         setRandomForm(newForm)
     }

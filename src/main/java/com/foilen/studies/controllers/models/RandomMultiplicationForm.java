@@ -14,32 +14,36 @@ public class RandomMultiplicationForm extends AbstractApiBase {
         return leftMax;
     }
 
-    public void setLeftMax(short leftMax) {
+    public RandomMultiplicationForm setLeftMax(short leftMax) {
         this.leftMax = leftMax;
+        return this;
     }
 
     public short getRightMax() {
         return rightMax;
     }
 
-    public void setRightMax(short rightMax) {
+    public RandomMultiplicationForm setRightMax(short rightMax) {
         this.rightMax = rightMax;
+        return this;
     }
 
     public short getAmount() {
         return amount;
     }
 
-    public void setAmount(short amount) {
+    public RandomMultiplicationForm setAmount(short amount) {
         this.amount = amount;
+        return this;
     }
 
     public boolean isLeftAlwaysSmaller() {
         return leftAlwaysSmaller;
     }
 
-    public void setLeftAlwaysSmaller(boolean leftAlwaysSmaller) {
+    public RandomMultiplicationForm setLeftAlwaysSmaller(boolean leftAlwaysSmaller) {
         this.leftAlwaysSmaller = leftAlwaysSmaller;
+        return this;
     }
 
 }

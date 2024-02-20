@@ -35,6 +35,13 @@ public class MultiplicationManagerImpl extends AbstractManager implements Multip
             return result;
         }
 
+        // Move the smaller one to left
+        if (form.getRightMax() < form.getLeftMax()) {
+            short temp = form.getLeftMax();
+            form.setLeftMax(form.getRightMax());
+            form.setRightMax(temp);
+        }
+
         // Get or create the scores
         var scores = multiplicationScoresRepository.findById(userId)
                 .orElseGet(() -> new MultiplicationScores()
@@ -45,6 +52,13 @@ public class MultiplicationManagerImpl extends AbstractManager implements Multip
         for (short left = 1; left <= form.getLeftMax(); ++left) {
             for (short right = 1; right <= form.getRightMax(); ++right) {
                 if (!form.isLeftAlwaysSmaller() || left <= right) {
+                    possibilities.add(new MultiplicationPossibility(left, right, scores.getScores()[left - 1][right - 1]));
+                }
+            }
+        }
+        if (!form.isLeftAlwaysSmaller()) {
+            for (short left = (short) (form.getLeftMax() + 1); left <= form.getRightMax(); ++left) {
+                for (short right = 1; right <= form.getLeftMax(); ++right) {
                     possibilities.add(new MultiplicationPossibility(left, right, scores.getScores()[left - 1][right - 1]));
                 }
             }
