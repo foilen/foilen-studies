@@ -1,5 +1,6 @@
 import playImage from "./play.png";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
+import {actionWhenEnterKey} from "./Forms";
 
 /**
  * Ask each word one after the other.
@@ -18,6 +19,7 @@ function AskWordsSection(props) {
     const [userAnswer, setUserAnswer] = useState({
         answer: ''
     })
+    const answerInput = useRef();
 
     // Progression
     const [transition, setTransition] = useState(false)
@@ -51,6 +53,10 @@ function AskWordsSection(props) {
         setCorrection(null)
         let currentWord = props.wordsToFind[idx]
         playMp3(currentWord.speakText.cacheId)
+
+        setTimeout(() => {
+            answerInput.current.focus()
+        }, 100)
     }
 
     function validateAnswer() {
@@ -127,8 +133,10 @@ function AskWordsSection(props) {
                                     <input type="text" className="form-control"
                                            autoComplete="off"
                                            name="answer"
+                                           ref={answerInput}
                                            value={userAnswer.answer}
-                                           onChange={(e) => updateAnswer(e, userAnswer, setUserAnswer)}
+                                           onChange={e => updateAnswer(e)}
+                                           onKeyUp={e => actionWhenEnterKey(e, validateAnswer)}
                                     />
                                 </div>
 
