@@ -174,6 +174,10 @@ function AskWordsSection(props) {
                              style={{width: score.fails * 100 / score.total + '%'}}>{score.fails}</div>
                         <div className="progress-bar bg-success" role="progressbar"
                              style={{width: score.success * 100 / score.total + '%'}}>{score.success}</div>
+                        <div className="progress-bar bg-secondary" role="progressbar"
+                             style={{width: (score.total - score.fails - score.success) * 100 / score.total + '%'}}>
+                            {score.total - score.fails - score.success}
+                        </div>
                     </div>
                 </div>
             </div>
