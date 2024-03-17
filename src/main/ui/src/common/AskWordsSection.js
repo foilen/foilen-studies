@@ -60,6 +60,9 @@ function AskWordsSection(props) {
     }
 
     function validateAnswer() {
+        if (transition) {
+            return
+        }
         let currentWord = props.wordsToFind[currentWordIdx]
         let expected = currentWord.word
         let actual = userAnswer.answer.trim()
