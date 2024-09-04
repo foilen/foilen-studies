@@ -1,8 +1,8 @@
 plugins {
     id "com.github.ben-manes.versions" version "0.51.0"
 
-    id 'org.springframework.boot' version '3.2.2'
-    id 'io.spring.dependency-management' version '1.1.4'
+    id 'org.springframework.boot' version '3.3.3'
+    id 'io.spring.dependency-management' version '1.1.6'
     id 'java'
 
     id 'com.github.node-gradle.node' version '7.0.2'
@@ -17,11 +17,11 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "5.8.0")
+    set('springCloudAzureVersion', "5.15.0")
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-mongodb:3.7.0'
+    implementation 'com.foilen:jl-smalltools-mongodb-spring:3.13.1'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.session:spring-session-data-mongodb'
@@ -34,12 +34,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 
     // Text to speech
-    implementation platform('com.google.cloud:libraries-bom:26.31.0')
+    implementation platform('com.google.cloud:libraries-bom:26.45.0')
     implementation 'com.google.cloud:google-cloud-texttospeech'
     implementation 'com.google.auth:google-auth-library-oauth2-http'
 
     // Test
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.12.2'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.17.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 }
