@@ -2,23 +2,27 @@ package com.foilen.studies.managers;
 
 import com.foilen.smalltools.listscomparator.ListComparatorHandler;
 import com.foilen.smalltools.listscomparator.ListsComparator;
+import com.foilen.smalltools.mongodb.distributed.MongoDbDeque;
 import com.foilen.smalltools.restapi.model.FormResult;
 import com.foilen.smalltools.restapi.services.FormValidationTools;
-import com.foilen.smalltools.tools.AbstractBasics;
-import com.foilen.smalltools.tools.CollectionsTools;
-import com.foilen.smalltools.tools.JsonTools;
-import com.foilen.smalltools.tools.StringTools;
+import com.foilen.smalltools.tools.*;
 import com.foilen.studies.controllers.models.*;
 import com.foilen.studies.data.UserScoresRepository;
 import com.foilen.studies.data.WordListRepository;
 import com.foilen.studies.data.WordRepository;
 import com.foilen.studies.data.vocabulary.*;
+import com.foilen.studies.services.AiGenerationService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -28,12 +32,95 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Transactional
 public class WordManagerImpl extends AbstractBasics implements WordManager {
 
+    private static final String CACHE_CANNOT_GEN_SENTENCE = "cannotGenSentence";
+
     @Autowired
-    private WordRepository wordRepository;
+    private AiGenerationService aiGenerationService;
+    @Autowired
+    private CacheManager cacheManager;
+    private Cache cannotGenSentenceCache;
+    @Autowired
+    private Environment environment;
+    @Autowired
+    private MongoDbDeque<String> generateSentenceForWordsWithoutOneQueue;
     @Autowired
     private UserScoresRepository userScoresRepository;
     @Autowired
     private WordListRepository wordListRepository;
+    @Autowired
+    private WordRepository wordRepository;
+
+    @PostConstruct
+    public void initProcessingSentenceGeneration() {
+
+        // Get the cache
+        cannotGenSentenceCache = cacheManager.getCache(CACHE_CANNOT_GEN_SENTENCE);
+
+        // Check the active profiles and must not contain "test"
+        if (Arrays.stream(environment.getActiveProfiles()).anyMatch("test"::equals)) {
+            logger.info("Skipping initProcessingSentenceGeneration because of test profile");
+            return;
+        }
+
+        ExecutorsTools.getCachedDaemonThreadPool().execute(() -> {
+
+            ThreadTools.nameThread()
+                    .clear().setSeparator("-")
+                    .appendText("processingSentenceGeneration")
+                    .change();
+
+            // Add some words to generate sentences for if none
+            generateSentenceForWordsWithoutOneAddMoreIfNoneOnTheQueue();
+
+            while (true) {
+
+                try {
+
+                    // Get the next word
+                    logger.info("Waiting for a word to generate a sentence for");
+                    String wordId = generateSentenceForWordsWithoutOneQueue.take();
+                    while ((wordId != null)) {
+                        // Get the word with the id
+                        logger.info("Getting word {}", wordId);
+                        var word = wordRepository.findById(wordId).orElse(null);
+                        if (word == null) {
+                            logger.error("Word {} not found", wordId);
+                        } else {
+
+                            // Check if the word is still the same as the text
+                            if (StringTools.safeEquals(word.getWord(), word.getSpeakText().getText())) {
+                                try {
+                                    logger.info("Generating sentence for word {}", word.getWord());
+                                    var sentence = aiGenerationService.generateSentence(getLocale(word), word.getWord());
+                                    logger.info("Generated sentence for word {}: {}", word.getWord(), sentence);
+                                    word.getSpeakText().setText(word.getWord() + ". " + sentence);
+                                    word.getSpeakText().computeCacheId();
+                                    wordRepository.save(word);
+                                } catch (Exception e) {
+                                    cannotGenSentenceCache.put(word.getWord(), true);
+                                    logger.error("Could not generate sentence for word {}", word.getWord(), e);
+                                }
+                            }
+
+                        }
+
+                        // Get the next word if any available in the next 15 seconds
+                        wordId = generateSentenceForWordsWithoutOneQueue.poll(15, TimeUnit.SECONDS);
+                        if (wordId == null) {
+                            logger.info("No word in the queue. Will try to add more and wait");
+                            generateSentenceForWordsWithoutOne();
+                        }
+
+                    }
+
+                } catch (Exception e) {
+                    logger.error("Unexpected issue. Sleeping 1 minute", e);
+                    ThreadTools.sleep(60000);
+                }
+            }
+
+        });
+    }
 
     @Override
     public List<Word> bulkSplit(String userId, String wordsInText, boolean acceptSpacesInWords) {
@@ -274,6 +361,7 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         );
 
         wordListRepository.save(wordList);
+        generateSentenceForWordsWithoutOneAddMoreIfNoneOnTheQueue();
         return formResult;
     }
 
@@ -319,6 +407,32 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
         return response;
     }
 
+    @Override
+    public void generateSentenceForWordsWithoutOne() {
+        logger.info("Generating sentences for words without one");
+        wordRepository.findAllWithSpeakTextSameAsWord().forEach(word -> {
+            // Check if in the cache that cannot be generated
+            if (cannotGenSentenceCache.get(word.getWord()) != null) {
+                logger.info("Skipping word {} because it cannot be generated", word.getWord());
+                return;
+            }
+
+            logger.info("Adding word {} to the queue", word.getWord());
+            generateSentenceForWordsWithoutOneQueue.add(word.getId());
+        });
+    }
+
+    @Override
+    public void generateSentenceForWordsWithoutOneAddMoreIfNoneOnTheQueue() {
+        logger.info("Adding more words to generate sentences for if none");
+        if (generateSentenceForWordsWithoutOneQueue.isEmpty()) {
+            logger.info("Queue is empty. Adding more words");
+            generateSentenceForWordsWithoutOne();
+        } else {
+            logger.info("Queue is not empty. Will not add more");
+        }
+    }
+
     private UserScores getOrCreateUserScores(String userId) {
         var userScores = userScoresRepository.findById(userId).orElse(null);
         if (userScores == null) {
@@ -332,6 +446,13 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     private static final Set<Character> SEPARATORS = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', '+', '*', '\\', '|', ';', '!', '?', '(', ')'));
     private static final Set<Character> SEPARATORS_WITH_SPACE = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' ', '+', '*', '\\', '|', ';', '!', '?', '(', ')'));
     private static final Map<Character, Character> replacements = Map.of('`', '\'');
+
+    private static Locale getLocale(Word word) {
+        return switch (word.getSpeakText().getLanguage()) {
+            case EN -> Locale.ENGLISH;
+            case FR -> Locale.FRENCH;
+        };
+    }
 
     static protected List<String> tokenize(String wordsInText, boolean acceptSpacesInWords) {
 

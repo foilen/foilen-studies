@@ -12,7 +12,7 @@ class WordManagerImplTest {
         var wordsInText = """
                 first,second, third
                 fourth/fifth. sixth
-                                
+                
                 super-high,fifth,FIFTH,École
                 aujourd'hui, aujourd`hui
                 hard* (abc)def/ghi\\jkl|mno+pqr;stu!vwx?yz

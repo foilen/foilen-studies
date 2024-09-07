@@ -24,4 +24,9 @@ public interface WordManager {
     FormResult deleteWordList(String userId, String wordListId);
 
     WordListExpended getWordListExpended(String userId, String wordListId);
+
+    void generateSentenceForWordsWithoutOne();
+
+    void generateSentenceForWordsWithoutOneAddMoreIfNoneOnTheQueue();
+
 }

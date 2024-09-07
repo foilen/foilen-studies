@@ -7,7 +7,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface WordRepository extends MongoRepository<Word, String> {
+public interface WordRepository extends MongoRepository<Word, String>, WordRepositoryCustom {
+
     Word findFirstBySpeakTextCacheId(String cacheId);
 
     Stream<Word> findAllBySpeakTextCacheIdIsNull();

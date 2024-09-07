@@ -14,14 +14,16 @@ sourceCompatibility = '21'
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 ext {
     set('springCloudAzureVersion', "5.15.0")
+    springAiVersion = "1.0.0-M2"
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-mongodb-spring:3.13.1'
+    implementation 'com.foilen:jl-smalltools-mongodb-5-spring:3.14.1'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.session:spring-session-data-mongodb'
@@ -37,6 +39,7 @@ dependencies {
     implementation platform('com.google.cloud:libraries-bom:26.45.0')
     implementation 'com.google.cloud:google-cloud-texttospeech'
     implementation 'com.google.auth:google-auth-library-oauth2-http'
+    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
 
     // Test
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.17.0'
@@ -47,6 +50,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
+        mavenBom "org.springframework.ai:spring-ai-bom:$springAiVersion"
     }
 }
 
@@ -59,23 +63,25 @@ tasks.named('test') {
 }
 
 // NodeJS
-node {
-    download = true
-    nodeProjectDir = file("${project.projectDir}/src/main/ui")
-}
+if (!System.getenv().containsKey('SKIP_NODEJS')) {
+    node {
+        download = true
+        nodeProjectDir = file("${project.projectDir}/src/main/ui")
+    }
 
-task copyNodeBuildFiles(type: Copy) {
-    from "${project.projectDir}/src/main/ui/build"
-    into "${project.projectDir}/build/resources/main/static"
-}
+    task copyNodeBuildFiles(type: Copy) {
+        from "${project.projectDir}/src/main/ui/build"
+        into "${project.projectDir}/build/resources/main/static"
+    }
 
-// npmInstall -> npm_run_build -> copyNodeBuildFiles
-tasks.bootJar.dependsOn copyNodeBuildFiles
-tasks.compileJava.dependsOn copyNodeBuildFiles
-tasks.copyNodeBuildFiles.dependsOn tasks.npm_run_build
-tasks.npm_run_build.dependsOn tasks.npmInstall
+    // npmInstall -> npm_run_build -> copyNodeBuildFiles
+    tasks.bootJar.dependsOn copyNodeBuildFiles
+    tasks.compileJava.dependsOn copyNodeBuildFiles
+    tasks.copyNodeBuildFiles.dependsOn tasks.npm_run_build
+    tasks.npm_run_build.dependsOn tasks.npmInstall
 
-// Start webui
-task npmRunWatch(type: NpmTask) {
-    args = ['run', 'watch']
+    // Start webui
+    task npmRunWatch(type: NpmTask) {
+        args = ['run', 'watch']
+    }
 }
