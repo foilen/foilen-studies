@@ -16,13 +16,37 @@ public class AiGenerationServiceImpl extends AbstractBasics implements AiGenerat
     private static final Set<Character> SEPARATORS_WITH_SPACE = new HashSet<>(Arrays.asList('\n', '\r', '\t', '.', ',', '/', ' ', '+', '*', '\\', '|', ';', '!', '?', '(', ')', '\''));
 
     public static final String SENTENCE_SYSTEM_PROMPT = """
-            - As an elementary school teacher, create a dictation sentence that includes the following word, written as is with the same gender number. When it is a verb, keep it in the infinitive form or in the conjugation form to stay the same.
+            - As an elementary school teacher, create a single dictation sentence that includes the following word, written as is with the same gender number. When it is a verb, keep it in the infinitive form or in the conjugation form to stay the same.
             - The sentence must be in {LANG}.
-            - Only output the sentence.
+            - Only output a single sentence, not multiple sentences.
             """;
 
     @Autowired
     private ChatClient chatClient;
+
+    /**
+     * Extract only the first sentence from a text that might contain multiple sentences.
+     * A sentence is considered to end with a period, exclamation mark, or question mark.
+     *
+     * @param text The text to extract the first sentence from
+     * @return The first sentence
+     */
+    protected static String extractFirstSentence(String text) {
+        int firstSentenceEnd = -1;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '.' || c == '!' || c == '?') {
+                firstSentenceEnd = i + 1;
+                break;
+            }
+        }
+
+        if (firstSentenceEnd > 0) {
+            return text.substring(0, firstSentenceEnd).trim();
+        }
+
+        return text;
+    }
 
     @Override
     public String generateSentence(Locale locale, String word) {
@@ -34,6 +58,19 @@ public class AiGenerationServiceImpl extends AbstractBasics implements AiGenerat
                 .user(word)
                 .call()
                 .content();
+
+        // Extract only the first sentence if multiple sentences are generated
+        String firstSentence = extractFirstSentence(sentence);
+        if (!firstSentence.equals(sentence)) {
+            logger.info("Extracted first sentence: {}", firstSentence);
+            sentence = firstSentence;
+        }
+
+        // Check that the sentence is not too long (max 200 characters)
+        if (sentence.length() > 200) {
+            logger.error("The sentence is too long: {} - {}", sentence.length(), sentence);
+            throw new RuntimeException("The sentence is too long");
+        }
 
         // Ensure the word is really in the sentence (case-insensitive)
         if (!checkWordInSentence(word, sentence)) {

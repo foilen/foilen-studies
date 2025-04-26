@@ -61,4 +61,34 @@ class AiGenerationServiceImplTest {
         Assertions.assertTrue(AiGenerationServiceImpl.checkWordInSentence(word, sentence));
     }
 
+    @Test
+    void extractFirstSentence_singleSentence() {
+        var text = "This is a single sentence.";
+        var result = AiGenerationServiceImpl.extractFirstSentence(text);
+        Assertions.assertEquals(text, result);
+    }
+
+    @Test
+    void extractFirstSentence_multipleSentences() {
+        var text = "This is the first sentence. This is the second sentence. This is the third sentence.";
+        var expected = "This is the first sentence.";
+        var result = AiGenerationServiceImpl.extractFirstSentence(text);
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    void extractFirstSentence_differentPunctuation() {
+        var text = "Is this a question? This is a statement. This is an exclamation!";
+        var expected = "Is this a question?";
+        var result = AiGenerationServiceImpl.extractFirstSentence(text);
+        Assertions.assertEquals(expected, result);
+    }
+
+    @Test
+    void extractFirstSentence_noEndingPunctuation() {
+        var text = "This sentence has no ending punctuation";
+        var result = AiGenerationServiceImpl.extractFirstSentence(text);
+        Assertions.assertEquals(text, result);
+    }
+
 }
