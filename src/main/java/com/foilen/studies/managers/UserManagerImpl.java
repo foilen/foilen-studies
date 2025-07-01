@@ -4,6 +4,7 @@ import com.foilen.smalltools.tools.AbstractBasics;
 import com.foilen.studies.data.UserRepository;
 import com.foilen.studies.data.user.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,11 @@ public class UserManagerImpl extends AbstractBasics implements UserManager {
     @Autowired
     private UserRepository userRepository;
 
+    @Value("${app.auth.local.enabled:false}")
+    private boolean localAuthEnabled;
+    @Value("${app.auth.local.userId:local-user}")
+    private String localUserId;
+
     @Override
     public UserDetails getOrCreateUser(Authentication authentication) {
         String providerId;
@@ -25,6 +31,10 @@ public class UserManagerImpl extends AbstractBasics implements UserManager {
             var providerName = authenticationToken.getAuthorizedClientRegistrationId();
             var providerUserId = authenticationToken.getName();
             providerId = providerName + "-" + providerUserId;
+        } else if (localAuthEnabled) {
+            // Use fixed user ID for local development
+            providerId = "local-" + localUserId;
+            logger.debug("Using local authentication with user ID: {}", localUserId);
         } else {
             throw new RuntimeException("Not OAuth2");
         }
