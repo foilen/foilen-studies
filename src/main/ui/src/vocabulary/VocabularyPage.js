@@ -30,13 +30,22 @@ function VocabularyPage() {
                 wordIds: [],
             })
             for (const item of items) {
+                // Prepare initial selection counts
+                const scores = item.scores || {};
+                const total = scores.total || (item.wordIds ? item.wordIds.length : 0) || 0;
+                const bad = scores.bad || 0;
+                const average = scores.average || 0;
+                const good = scores.good || 0;
+                // Words with no score are total minus known scored ones (ensure not negative)
+                const noScore = Math.max(0, total - (bad + average + good));
+
                 item.choice = {
                     selected: false,
-                    anyScoreCount: item.wordIds ? item.wordIds.length : 0,
-                    noScoreCount: 0,
-                    badScoreCount: 0,
-                    averageScoreCount: 0,
-                    goodScoreCount: 0,
+                    anyScoreCount: 0,
+                    noScoreCount: noScore,
+                    badScoreCount: bad,
+                    averageScoreCount: average,
+                    goodScoreCount: good,
                 }
             }
             setWordLists(items)
