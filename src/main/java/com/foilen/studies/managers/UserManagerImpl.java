@@ -16,6 +16,8 @@ import java.util.Date;
 @Transactional
 public class UserManagerImpl extends AbstractBasics implements UserManager {
 
+    private static final long TEN_MINUTES_MILLIS = 10L * 60L * 1000L;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -41,12 +43,21 @@ public class UserManagerImpl extends AbstractBasics implements UserManager {
 
         // Get or create
         UserDetails userDetails = userRepository.findByProviderIds(providerId);
+        Date now = new Date();
         if (userDetails == null) {
             userDetails = new UserDetails();
             userDetails.getProviderIds().add(providerId);
-            userDetails.setCreationDate(new Date());
+            userDetails.setCreationDate(now);
+            userDetails.setLastLoginDate(now);
             userDetails = userRepository.save(userDetails);
+        } else {
+            Date last = userDetails.getLastLoginDate();
+            if (last == null || (now.getTime() - last.getTime()) > TEN_MINUTES_MILLIS) {
+                userDetails.setLastLoginDate(now);
+                userDetails = userRepository.save(userDetails);
+            }
         }
+
         return userDetails;
     }
 }

@@ -15,6 +15,7 @@ public class UserDetails {
     private Set<String> providerIds = new HashSet<>();
 
     private Date creationDate;
+    private Date lastLoginDate;
 
     public String getId() {
         return id;
@@ -39,4 +40,13 @@ public class UserDetails {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
+
+    public Date getLastLoginDate() {
+        return lastLoginDate;
+    }
+
+    public void setLastLoginDate(Date lastLoginDate) {
+        this.lastLoginDate = lastLoginDate;
+    }
+
 }
