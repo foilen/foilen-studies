@@ -48,6 +48,15 @@ public class WordListController {
         return result;
     }
 
+    @PostMapping("/copy")
+    public FormResult copy(
+            Authentication authentication,
+            @RequestBody CopyWordListForm form
+    ) {
+        var userDetails = userManager.getOrCreateUser(authentication);
+        return wordManager.copyWordList(userDetails.getId(), form.getFromWordListId(), form.getToWordListId());
+    }
+
     @DeleteMapping("/{wordListId}")
     public FormResult delete(
             Authentication authentication,

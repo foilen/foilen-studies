@@ -408,6 +408,38 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
     }
 
     @Override
+    public FormResult copyWordList(String userId, String fromWordListId, String toWordListId) {
+        FormResult formResult = new FormResult();
+
+        // Validate presence
+        FormValidationTools.validateMandatory(formResult, "fromWordListId", fromWordListId);
+        FormValidationTools.validateMandatory(formResult, "toWordListId", toWordListId);
+        if (!formResult.isSuccess()) {
+            return formResult;
+        }
+
+        // Load lists with permission (must own both)
+        var fromList = wordListRepository.findByIdAndOwnerUserId(fromWordListId, userId);
+        var toList = wordListRepository.findByIdAndOwnerUserId(toWordListId, userId);
+        if (fromList == null) {
+            CollectionsTools.getOrCreateEmptyArrayList(formResult.getValidationErrorsByField(), "fromWordListId", String.class).add("Source word list does not exist");
+            return formResult;
+        }
+        if (toList == null) {
+            CollectionsTools.getOrCreateEmptyArrayList(formResult.getValidationErrorsByField(), "toWordListId", String.class).add("Destination word list does not exist");
+            return formResult;
+        }
+
+        // Merge words without duplicates
+        Set<String> merged = new LinkedHashSet<>(toList.getWordIds());
+        merged.addAll(fromList.getWordIds());
+        toList.setWordIds(new ArrayList<>(merged));
+        wordListRepository.save(toList);
+
+        return formResult;
+    }
+
+    @Override
     public void generateSentenceForWordsWithoutOne() {
         logger.info("Generating sentences for words without one");
         wordRepository.findAllWithSpeakTextSameAsWord().forEach(word -> {

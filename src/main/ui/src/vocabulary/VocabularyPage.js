@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {autoRetry} from "../service";
+import {autoRetry, failuresToToast} from "../service";
 import lodash from "lodash";
 import {NavLink} from "react-router-dom";
 import "./VocabularyPage.css"
@@ -11,6 +11,11 @@ function VocabularyPage() {
     // Initial details
     const [wordLists, setWordLists] = useState([])
 
+    // Copy feature
+    const [showCopyDialog, setShowCopyDialog] = useState(false)
+    const [copyFromWordList, setCopyFromWordList] = useState(null)
+    const [copyDestinationId, setCopyDestinationId] = useState("")
+
     // Main game
     const [wordsToFind, setWordsToFind] = useState(null)
 
@@ -18,6 +23,10 @@ function VocabularyPage() {
     const [finalScore, setFinalScore] = useState(null)
 
     useEffect(() => {
+        refreshWordLists();
+    }, [])
+
+    function refreshWordLists() {
         autoRetry('Get Word Lists', () => window.service.wordListList(), 5).then(response => {
             let items = response.data.items
             if (!items) {
@@ -50,7 +59,7 @@ function VocabularyPage() {
             }
             setWordLists(items)
         })
-    }, [])
+    }
 
     function toggleSelect(wordListIdx) {
         let nextWordLists = [...wordLists]
@@ -66,6 +75,27 @@ function VocabularyPage() {
                 setWordLists(nextWordLists)
             })
         }
+    }
+
+    function showCopyToAnotherListDialog(fromWordList) {
+        const otherLists = wordLists.filter(wl => wl.id && wl.id !== fromWordList.id)
+        if (otherLists.length === 0) {
+            toast.warn("Aucune autre liste disponible")
+            return
+        }
+        setCopyFromWordList(fromWordList)
+        setCopyDestinationId("")
+        setShowCopyDialog(true)
+    }
+
+    function copyToAnotherList() {
+        const toWordListId = copyDestinationId
+        const fromWordListId = copyFromWordList.id
+        setShowCopyDialog(false)
+        failuresToToast('Copier la liste', () => window.service.wordListCopy({
+            fromWordListId,
+            toWordListId,
+        }), true, refreshWordLists)
     }
 
     function changeScoreCount(wordListIdx, fieldName, value) {
@@ -144,6 +174,10 @@ function VocabularyPage() {
                                 {wordList.id && <>
                                     <NavLink to={`/vocabulary/${wordList.id}`}
                                              className="btn btn-outline-primary">Éditer</NavLink>
+                                    <button className="btn btn-outline-secondary ms-2"
+                                            onClick={() => showCopyToAnotherListDialog(wordList)}>
+                                        Copier dans une autre liste
+                                    </button>
                                     <button className="btn btn-danger float-end"
                                             onClick={() => deleteWordList(wordList)}>X
                                     </button>
@@ -268,6 +302,42 @@ function VocabularyPage() {
                 }
 
             </div>
+
+            {showCopyDialog && (
+                <div className="modal d-block" tabIndex="-1" style={{backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Copier "{copyFromWordList ? copyFromWordList.name : ''}"
+                                    vers...</h5>
+                                <button type="button" className="btn-close" aria-label="Close"
+                                        onClick={() => setShowCopyDialog(false)}/>
+                            </div>
+                            <div className="modal-body">
+                                <p>Choisissez la liste de destination:</p>
+                                <select className="form-select" value={copyDestinationId}
+                                        onChange={e => setCopyDestinationId(e.target.value)}>
+                                    <option value="">-- Sélectionnez --</option>
+                                    {wordLists
+                                        .filter(wl => wl.id && (!copyFromWordList || wl.id !== copyFromWordList.id))
+                                        .map(wl => (
+                                            <option key={wl.id} value={wl.id}>{wl.name}</option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary"
+                                        onClick={() => setShowCopyDialog(false)}>Annuler
+                                </button>
+                                <button type="button" className="btn btn-primary" disabled={!copyDestinationId}
+                                        onClick={copyToAnotherList}>Copier
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }

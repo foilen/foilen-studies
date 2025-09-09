@@ -68,6 +68,10 @@ export class Service {
         return this.axiosInstance.post('/wordList/bulkSplit', form)
     }
 
+    wordListCopy(form) {
+        return this.axiosInstance.post('/wordList/copy', form)
+    }
+
     wordListRandom(form) {
         return this.axiosInstance.post('/wordList/random', form)
     }
@@ -97,7 +101,7 @@ export function autoRetry(context, promiseProvider, delayInSec) {
 
 }
 
-export function failuresToToast(context, promiseProvider, showSuccess = true) {
+export function failuresToToast(context, promiseProvider, showSuccess = true, successOnAction) {
 
     return new Promise((resolve) => {
 
@@ -108,6 +112,9 @@ export function failuresToToast(context, promiseProvider, showSuccess = true) {
                     if (response.data.success === undefined || response.data.success) {
                         if (showSuccess) {
                             toast.success(`[${context}] Done`)
+                        }
+                        if (successOnAction) {
+                            successOnAction(response.data)
                         }
                         resolve(response)
                     } else {

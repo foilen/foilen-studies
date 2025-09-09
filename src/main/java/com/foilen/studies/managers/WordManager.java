@@ -13,6 +13,8 @@ public interface WordManager {
 
     List<Word> bulkSplit(String userId, String wordsInText, boolean acceptSpacesInWords);
 
+    FormResult copyWordList(String userId, String fromWordListId, String toWordListId);
+
     List<Word> randomWord(String userId, RandomWordListForm form);
 
     FormResult track(String userId, TrackForm form);
