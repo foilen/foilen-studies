@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:central.sonatype.com)",
+      "WebFetch(domain:mvnrepository.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(SKIP_NODEJS=1 ./gradlew:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
