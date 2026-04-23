@@ -32,6 +32,18 @@ export class Service {
         return this.axiosInstance.post('/multiplication/track', form)
     }
 
+    divisionRandom(form) {
+        return this.axiosInstance.post('/division/random', form)
+    }
+
+    divisionScores() {
+        return this.axiosInstance.get('/division/scores')
+    }
+
+    divisionTrack(form) {
+        return this.axiosInstance.post('/division/track', form)
+    }
+
     verbList() {
         return this.axiosInstance.get('/verb/')
     }
