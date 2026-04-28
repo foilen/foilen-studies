@@ -5,7 +5,7 @@ import com.foilen.studies.StudiesApplication;
 import com.foilen.studies.data.SpeakTextCacheFileRepository;
 import com.foilen.studies.data.WordRepository;
 import com.foilen.studies.fakedata.FakeDataLoader;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +39,7 @@ class SpeechServiceImplTest {
 
         // Ensure at least one has a cached value
         var speakTextCacheFile = speakTextCacheFileRepository.findAllByCacheIdIn(allSpeakTextCacheFileIds);
-        Assert.assertFalse("There should be at least one speak text cache file used by a word", speakTextCacheFile.isEmpty());
+        Assertions.assertFalse(speakTextCacheFile.isEmpty(), "There should be at least one speak text cache file used by a word");
 
         // Cleanup
         speechService.cleanupSpeakTextCacheFile();
@@ -50,7 +50,7 @@ class SpeechServiceImplTest {
 
         // Ensure the unused ones are gone
         var unusedSpeakTextCacheFile = speakTextCacheFileRepository.findAllByCacheIdNotIn(allSpeakTextCacheFileIds);
-        Assert.assertTrue("There should be no unused speak text cache file", unusedSpeakTextCacheFile.isEmpty());
+        Assertions.assertTrue(unusedSpeakTextCacheFile.isEmpty(), "There should be no unused speak text cache file");
 
     }
 }

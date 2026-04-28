@@ -29,7 +29,7 @@ public class SpringSecurityConfig extends AbstractBasics {
 
         http.csrf(csrf -> csrf
                 .csrfTokenRepository(cookieCsrfTokenRepository())
-                .csrfTokenRequestHandler((request, response, supplier) -> {
+                .csrfTokenRequestHandler((request, _, _) -> {
                     String token = request.getHeader("X-XSRF-TOKEN");
                     if (token != null) {
                         request.setAttribute("_csrf", token);
@@ -56,7 +56,7 @@ public class SpringSecurityConfig extends AbstractBasics {
         } else {
             // Use OAuth2 login for production
             http.oauth2Login(Customizer.withDefaults());
-            http.oauth2Client(oauth2 -> {
+            http.oauth2Client(_ -> {
             });
         }
 

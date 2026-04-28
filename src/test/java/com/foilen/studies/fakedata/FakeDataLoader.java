@@ -17,7 +17,7 @@ public class FakeDataLoader extends AbstractBasics {
     @Autowired
     private MongoClient mongoClient;
 
-    @Value("${spring.data.mongodb.database}")
+    @Value("${spring.mongodb.database}")
     private String databaseName;
 
     public void loadFakeData() {

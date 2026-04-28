@@ -1,11 +1,12 @@
 plugins {
-    id "com.github.ben-manes.versions" version "0.53.0"
+    id "com.github.ben-manes.versions" version "$benManesVersionsVersion"
 
-    id 'org.springframework.boot' version '3.5.6'
-    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.springframework.boot' version "$springBootVersion"
+    id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
     id 'java'
 
-    id 'com.github.node-gradle.node' version '7.1.0'
+    id 'com.github.node-gradle.node' version "$nodeGradleVersion"
+    id "org.openrewrite.rewrite" version "$openRewriteVersion"
 }
 
 group = 'com.foilen'
@@ -22,33 +23,47 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "6.0.0")
-    springAiVersion = "1.0.0-M6"
+    set('springCloudAzureVersion', "$springCloudAzureVersion")
+    springAiVersion = "$springAiVersion"
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.java.migrate.UpgradeToJava25")
+    activeRecipe("org.openrewrite.java.spring.boot2.SpringBoot2JUnit4to5Migration")
+    activeRecipe("org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0")
+    activeStyle("org.openrewrite.java.IntelliJ")
+    setExportDatatables(true)
 }
 
 dependencies {
-    implementation 'com.foilen:jl-smalltools-mongodb-5-spring:3.23.0'
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:$openRewriteRecipeBomVersion"))
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+    runtimeOnly "jakarta.xml.bind:jakarta.xml.bind-api:4.0.5"
+    runtimeOnly "javax.xml.bind:jaxb-api:2.3.1"
+    rewrite("org.openrewrite.recipe:rewrite-spring:$openRewriteSpringVersion")
+
+    implementation "com.foilen:jl-smalltools-mongodb-5-spring:$jlSmalltoolsMongodbVersion"
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.session:spring-session-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+    implementation "org.springframework.session:spring-session-data-mongodb:$springSessionMongodbVersion"
 
     // Database
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // Login
     implementation 'com.azure.spring:spring-cloud-azure-starter-active-directory'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
 
     // Text to speech
-    implementation platform('com.google.cloud:libraries-bom:26.70.0')
+    implementation platform("com.google.cloud:libraries-bom:$googleCloudLibrariesBomVersion")
     implementation 'com.google.cloud:google-cloud-texttospeech'
     implementation 'com.google.auth:google-auth-library-oauth2-http'
-    implementation 'org.springframework.ai:spring-ai-openai-spring-boot-starter'
+    implementation 'org.springframework.ai:spring-ai-starter-model-openai'
 
     // Test
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.21.0'
+    testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo:$flapdoodleMongoVersion"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 }
 
 dependencyManagement {

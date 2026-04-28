@@ -245,13 +245,13 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
 
         // Get the current scores and update them
         var userScores = getOrCreateUserScores(userId);
-        var score = userScores.getScoreByWordId().computeIfAbsent(form.getWordId(), wordId -> new Score());
+        var score = userScores.getScoreByWordId().computeIfAbsent(form.getWordId(), _ -> new Score());
         var lastScoreItems = score.getLastScoreItems();
         lastScoreItems.add(new ScoreItem(form.isSuccess(), form.getAnswer()));
 
         // Keep only last 10
         while (lastScoreItems.size() > 10) {
-            lastScoreItems.remove(0);
+            lastScoreItems.removeFirst();
         }
 
         // Compute score

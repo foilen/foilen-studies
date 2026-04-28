@@ -18,7 +18,7 @@ public class UpgradeTasksSpringConfig {
     @Autowired
     private MongoClient mongoClient;
 
-    @Value("${spring.data.mongodb.database}")
+    @Value("${spring.mongodb.database}")
     private String databaseName;
 
     @Bean

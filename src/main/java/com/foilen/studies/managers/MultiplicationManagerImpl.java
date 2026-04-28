@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @Transactional
@@ -142,7 +143,7 @@ public class MultiplicationManagerImpl extends AbstractManager implements Multip
         // Add randomly
         logger.info("Adding randomly ; amountLeft={}", amountLeft);
         while (amountLeft > 0) {
-            int index = (int) (Math.random() * possibilities.size());
+            int index = (int) (ThreadLocalRandom.current().nextDouble() * possibilities.size());
             MultiplicationPossibility possibility = possibilities.get(index);
             questions.add(new Short[]{possibility.left(), possibility.right()});
             --amountLeft;
