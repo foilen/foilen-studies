@@ -19,6 +19,7 @@ public class AiGenerationServiceImpl extends AbstractBasics implements AiGenerat
             - As an elementary school teacher, create a single dictation sentence that includes the following word, written as is with the same gender number. When it is a verb, keep it in the infinitive form or in the conjugation form to stay the same.
             - The sentence must be in {LANG}.
             - Only output a single sentence, not multiple sentences.
+            - Output text without any formatting.
             """;
 
     @Autowired
