@@ -101,9 +101,6 @@ function DivisionPage() {
 
         // Check if answer is correct
         let question = questions[nextQuestion]
-        // question[0] = divisor, question[1] = quotient
-        // dividend = divisor * quotient
-        let dividend = question[0] * question[1]
         let correctAnswer = question[1]
         let correct = correctAnswer === parseInt(answer)
 

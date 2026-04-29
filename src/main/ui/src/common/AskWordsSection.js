@@ -1,5 +1,5 @@
 import playImage from "./play.png";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {actionWhenEnterKey} from "./Forms";
 
 /**
@@ -31,12 +31,6 @@ function AskWordsSection(props) {
     })
     const [wrongAnswers, setWrongAnswers] = useState([])
 
-    // Start
-    useEffect(() => {
-        console.log('Start from the top')
-        changeCurrentWord(0)
-    }, [props.wordsToFind])
-
     function playMp3(speakTextCacheId) {
         new Audio(`/speakText/${speakTextCacheId}`).play()
     }
@@ -46,7 +40,7 @@ function AskWordsSection(props) {
         setUserAnswer(prevState => ({...prevState, answer: value}))
     }
 
-    function changeCurrentWord(idx) {
+    const changeCurrentWord = useCallback((idx) => {
         setCurrentWordIdx(idx)
         setUserAnswer({answer: ''})
         setTransition(false)
@@ -57,7 +51,13 @@ function AskWordsSection(props) {
         setTimeout(() => {
             answerInput.current.focus()
         }, 100)
-    }
+    }, [props.wordsToFind])
+
+    // Start
+    useEffect(() => {
+        console.log('Start from the top')
+        changeCurrentWord(0)
+    }, [props.wordsToFind, changeCurrentWord])
 
     function validateAnswer() {
         if (transition) {

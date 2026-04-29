@@ -73,7 +73,7 @@ function HomePage() {
                             amélioration.
                         </p>
                         <a href="https://github.com/foilen/foilen-studies" className="btn btn-primary"
-                           target="_blank">GitHub</a>
+                           target="_blank" rel="noreferrer">GitHub</a>
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@ function HomePage() {
                             Si vous avez des questions, des problèmes ou des suggestions, n'hésitez pas à me contacter.
                         </p>
                         <a href="mailto:simon@foilen.com?subject=Foilen études" className="btn btn-primary"
-                           target="_blank">Courriel</a>
+                           target="_blank" rel="noreferrer">Courriel</a>
                     </div>
                 </div>
             </div>
