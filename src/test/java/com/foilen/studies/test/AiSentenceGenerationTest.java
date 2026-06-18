@@ -52,11 +52,11 @@ public class AiSentenceGenerationTest {
                     String sentence;
                     try {
                         sentence = aiGenerationService.generateSentence(Locale.FRENCH, word);
-                    } catch (Exception e) {
+                    } catch (Exception _) {
                         sentence = "ERROR";
                     }
                     String line = word + " => " + sentence;
-                    System.out.println(line);
+                    IO.println(line);
                     writer.println(line);
                 }
             } catch (Exception e) {
