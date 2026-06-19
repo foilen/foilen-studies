@@ -80,28 +80,48 @@ public class WordManagerImpl extends AbstractBasics implements WordManager {
                     logger.info("Waiting for a word to generate a sentence for");
                     String wordId = generateSentenceForWordsWithoutOneQueue.take();
                     while ((wordId != null)) {
-                        // Get the word with the id
-                        logger.info("Getting word {}", wordId);
-                        var word = wordRepository.findById(wordId).orElse(null);
-                        if (word == null) {
-                            logger.error("Word {} not found", wordId);
-                        } else {
+                        // Collect up to 10 word IDs
+                        List<String> wordIds = new ArrayList<>();
+                        wordIds.add(wordId);
+                        generateSentenceForWordsWithoutOneQueue.drainTo(wordIds, 9);
+                        logger.info("Processing batch of {} words", wordIds.size());
 
-                            // Check if the word is still the same as the text
-                            if (StringTools.safeEquals(word.getWord(), word.getSpeakText().getText())) {
-                                try {
-                                    logger.info("Generating sentence for word {}", word.getWord());
-                                    var sentence = aiGenerationService.generateSentence(getLocale(word), word.getWord());
-                                    logger.info("Generated sentence for word {}: {}", word.getWord(), sentence);
-                                    word.getSpeakText().setText(word.getWord() + ". " + sentence);
-                                    word.getSpeakText().computeCacheId();
-                                    wordRepository.save(word);
-                                } catch (Exception e) {
-                                    cannotGenSentenceCache.put(word.getWord(), true);
-                                    logger.error("Could not generate sentence for word {}", word.getWord(), e);
+                        // Fetch all words and log missing ones
+                        Map<String, Word> wordsById = StreamSupport.stream(wordRepository.findAllById(wordIds).spliterator(), false)
+                                .collect(Collectors.toMap(Word::getId, w -> w));
+                        wordIds.stream()
+                                .filter(id -> !wordsById.containsKey(id))
+                                .forEach(id -> logger.error("Word {} not found", id));
+
+                        // Filter words that still need processing and group by locale
+                        Map<Locale, List<Word>> wordsByLocale = wordsById.values().stream()
+                                .filter(w -> StringTools.safeEquals(w.getWord(), w.getSpeakText().getText()))
+                                .collect(Collectors.groupingBy(WordManagerImpl::getLocale));
+
+                        for (var localeEntry : wordsByLocale.entrySet()) {
+                            Locale locale = localeEntry.getKey();
+                            List<Word> words = localeEntry.getValue();
+                            List<String> wordNames = words.stream()
+                                    .map(Word::getWord)
+                                    .toList();
+                            try {
+                                logger.info("Generating sentences for {} word(s) in locale {}: {}", wordNames.size(), locale, wordNames);
+                                Map<String, String> sentences = aiGenerationService.generateSentences(locale, wordNames);
+                                for (Word word : words) {
+                                    String sentence = sentences.get(word.getWord());
+                                    if (sentence != null) {
+                                        logger.info("Generated sentence for word {}: {}", word.getWord(), sentence);
+                                        word.getSpeakText().setText(word.getWord() + ". " + sentence);
+                                        word.getSpeakText().computeCacheId();
+                                        wordRepository.save(word);
+                                    } else {
+                                        logger.error("No sentence returned for word {}", word.getWord());
+                                    }
                                 }
+                            } catch (Exception e) {
+                                words.forEach(w -> cannotGenSentenceCache.put(w.getWord(), true));
+                                logger.error("Could not generate sentences for words {}", wordNames, e);
                             }
-
                         }
 
                         // Get the next word if any available in the next 15 seconds

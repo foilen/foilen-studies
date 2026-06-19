@@ -3,6 +3,9 @@ package com.foilen.studies.services;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 class AiGenerationServiceImplTest {
 
     @Test
@@ -62,33 +65,29 @@ class AiGenerationServiceImplTest {
     }
 
     @Test
-    void extractFirstSentence_singleSentence() {
-        var text = "This is a single sentence.";
-        var result = AiGenerationServiceImpl.extractFirstSentence(text);
-        Assertions.assertEquals(text, result);
+    void parseSentencesResponse_ok() {
+        var words = List.of("ami", "bonheur", "chat");
+        var response = """
+                ami: Mon ami joue dans le jardin.
+                bonheur: Le bonheur est une chose précieuse.
+                chat: Le chat dort sur le canapé.
+                """;
+        Map<String, String> result = AiGenerationServiceImpl.parseSentencesResponse(words, response);
+        Assertions.assertEquals("Mon ami joue dans le jardin.", result.get("ami"));
+        Assertions.assertEquals("Le bonheur est une chose précieuse.", result.get("bonheur"));
+        Assertions.assertEquals("Le chat dort sur le canapé.", result.get("chat"));
     }
 
     @Test
-    void extractFirstSentence_multipleSentences() {
-        var text = "This is the first sentence. This is the second sentence. This is the third sentence.";
-        var expected = "This is the first sentence.";
-        var result = AiGenerationServiceImpl.extractFirstSentence(text);
-        Assertions.assertEquals(expected, result);
-    }
-
-    @Test
-    void extractFirstSentence_differentPunctuation() {
-        var text = "Is this a question? This is a statement. This is an exclamation!";
-        var expected = "Is this a question?";
-        var result = AiGenerationServiceImpl.extractFirstSentence(text);
-        Assertions.assertEquals(expected, result);
-    }
-
-    @Test
-    void extractFirstSentence_noEndingPunctuation() {
-        var text = "This sentence has no ending punctuation";
-        var result = AiGenerationServiceImpl.extractFirstSentence(text);
-        Assertions.assertEquals(text, result);
+    void parseSentencesResponse_skipsUnknownWords() {
+        var words = List.of("ami");
+        var response = """
+                ami: Mon ami joue dans le jardin.
+                inconnu: Une ligne inconnue.
+                """;
+        Map<String, String> result = AiGenerationServiceImpl.parseSentencesResponse(words, response);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals("Mon ami joue dans le jardin.", result.get("ami"));
     }
 
 }

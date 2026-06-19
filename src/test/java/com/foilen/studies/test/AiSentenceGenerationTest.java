@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class AiSentenceGenerationTest {
 
@@ -48,13 +49,9 @@ public class AiSentenceGenerationTest {
 
             String reportFile = "_report_sentence_" + modelName + ".txt";
             try (PrintWriter writer = new PrintWriter(new FileWriter(reportFile))) {
+                Map<String, String> sentences = aiGenerationService.generateSentences(Locale.FRENCH, words);
                 for (String word : words) {
-                    String sentence;
-                    try {
-                        sentence = aiGenerationService.generateSentence(Locale.FRENCH, word);
-                    } catch (Exception _) {
-                        sentence = "ERROR";
-                    }
+                    String sentence = sentences.getOrDefault(word, "ERROR");
                     String line = word + " => " + sentence;
                     IO.println(line);
                     writer.println(line);
