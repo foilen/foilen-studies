@@ -2,7 +2,7 @@
 
 For the official build, it will automatically compile it when going `./gradlew build`.
 
-For development, you can run `npm run watch` and then run the Java application. 
+For development, you can run `npm run watch` and then run the Java application.
 It will automatically compile when any file in the webui changes.
 
 # Install and configure
@@ -11,19 +11,21 @@ It will automatically compile when any file in the webui changes.
 - Put those files in the working directory of the application
 - Run the application
 
-# Local Authentication for Development
+# Authentication
 
-For local testing, you can use a simple local authentication mechanism. This allows you to log in with a predefined user ID without needing to set up OAuth2 providers.
+Users log in with their email, either:
 
-In `application.properties` put:
-```
-# Local authentication (for development only)
-app.auth.local.enabled: true
-app.auth.local.userId: local-user
-```
+- with a password (that they can set in the "Mot de passe" page once logged in)
+- with a one-time code that is sent by email (the user is created on the first code request)
 
-You can change the local user ID by modifying the `app.auth.local.userId` property.
+Configure the SMTP server with the `spring.mail.*` properties and the sender with `app.mailFrom` (see
+`sample_config/application.properties`).
 
-To disable local authentication and use OAuth2 instead, set `app.auth.local.enabled: false`.
+Users that existed before the switch from Microsoft (Azure) have no email. To link one, set its `email` (lowercase) in
+its `userDetails` document in MongoDB.
 
-**Note:** Local authentication should only be used for development and testing, not in production.
+### Local mail server
+
+Run `./mailpit-start.sh` (needs Docker) to start a [Mailpit](https://mailpit.axllent.org/) catch-all and set
+`spring.mail.host: localhost` and `spring.mail.port: 1026` in `application.properties`. Read the captured emails (login
+codes) at http://localhost:8025/. Stop it with `./mailpit-stop.sh`.

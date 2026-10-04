@@ -12,12 +12,32 @@ export class Service {
         return this.axiosInstance.get('/appDetails/googleAnalytics')
     }
 
-    userGet() {
-        return this.axiosInstance.get('/user')
+    userChangePassword(form) {
+        return this.axiosInstance.post('/user/changePassword', form)
+    }
+
+    userCsrf() {
+        return this.axiosInstance.get('/user/csrf')
     }
 
     userIsLoggedIn() {
         return this.axiosInstance.get('/user/isLoggedIn')
+    }
+
+    userLogin(form) {
+        return this.axiosInstance.post('/user/login', form)
+    }
+
+    userLoginWithCode(form) {
+        return this.axiosInstance.post('/user/loginWithCode', form)
+    }
+
+    userLoginWithCodeRequest(form) {
+        return this.axiosInstance.post('/user/loginWithCodeRequest', form)
+    }
+
+    userLogout() {
+        return this.axiosInstance.post('/user/logout')
     }
 
     multiplicationRandom(form) {

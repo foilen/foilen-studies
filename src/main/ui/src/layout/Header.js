@@ -1,7 +1,7 @@
 import React from "react";
 import {NavLink} from "react-router-dom";
 
-function Header() {
+function Header({loggedIn, onLogout}) {
     return (
         <nav className="navbar navbar-expand-lg bg-light">
             <div className="container-fluid">
@@ -28,6 +28,21 @@ function Header() {
                         <li className="nav-item">
                             <NavLink to="/division" className="nav-link">Division</NavLink>
                         </li>
+                    </ul>
+                    <ul className="navbar-nav mb-2 mb-lg-0">
+                        {loggedIn === false && (
+                            <li className="nav-item">
+                                <NavLink to="/login" className="nav-link">Connexion</NavLink>
+                            </li>
+                        )}
+                        {loggedIn && (<>
+                            <li className="nav-item">
+                                <NavLink to="/password" className="nav-link">Mot de passe</NavLink>
+                            </li>
+                            <li className="nav-item">
+                                <button type="button" className="nav-link" onClick={onLogout}>Déconnexion</button>
+                            </li>
+                        </>)}
                     </ul>
                 </div>
             </div>

@@ -3,8 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import 'react-toastify/dist/ReactToastify.css';
 import {ToastContainer} from "react-toastify";
-import React from "react";
-import {HashRouter as Router, Outlet, Route, Routes} from "react-router-dom";
+import React, {useCallback, useEffect, useState} from "react";
+import {HashRouter as Router, Navigate, Outlet, Route, Routes, useLocation} from "react-router-dom";
 import Header from './layout/Header.js';
 import HomePage from "./home/HomePage";
 import VocabularyPage from "./vocabulary/VocabularyPage";
@@ -15,19 +15,49 @@ import Footer from "./layout/Footer";
 import GoogleAnalytics from "./common/GoogleAnalytics";
 import MultiplicationPage from "./multiplication/MultiplicationPage";
 import DivisionPage from "./division/DivisionPage";
+import LoginPage from "./user/LoginPage";
+import ChangePasswordPage from "./user/ChangePasswordPage";
 
-function Page() {
+function Page({loggedIn, onLoggedIn}) {
+    // The home page is public. The rest needs a login
+    const location = useLocation()
+    if (loggedIn === null) {
+        return <div className="Page"></div>
+    }
+    if (loggedIn && location.pathname === '/login') {
+        return <Navigate to="/" replace/>
+    }
+    if (!loggedIn && location.pathname !== '/') {
+        return <div className="Page"><LoginPage onLoggedIn={onLoggedIn}/></div>
+    }
     return <div className="Page"><Outlet/></div>;
 }
 
 function App() {
+    const [loggedIn, setLoggedIn] = useState(null)
+
+    const refreshLoggedIn = useCallback(() => {
+        window.service.userCsrf()
+            .then(() => window.service.userIsLoggedIn())
+            .then((response) => setLoggedIn(response.data))
+            .catch(() => setLoggedIn(false))
+    }, [])
+    useEffect(refreshLoggedIn, [refreshLoggedIn])
+
+    const logout = () => {
+        window.service.userLogout().finally(() => {
+            window.location.hash = '#/'
+            window.location.reload()
+        })
+    }
+
     return (
         <Router>
             <div className="App">
-                <Header/>
+                <Header loggedIn={loggedIn} onLogout={logout}/>
                 <div className="container-fluid">
                     <Routes>
-                        <Route path="/" element={<Page/>}>
+                        <Route path="/" element={<Page loggedIn={loggedIn} onLoggedIn={refreshLoggedIn}/>}>
                             <Route path="" element={<HomePage/>}/>
                             <Route path="vocabulary/">
                                 <Route path="" element={<VocabularyPage/>}/>
@@ -41,6 +71,8 @@ function App() {
                             </Route>
                             <Route path="multiplication" element={<MultiplicationPage/>}/>
                             <Route path="division" element={<DivisionPage/>}/>
+                            <Route path="login" element={<div/>}/>
+                            <Route path="password" element={<ChangePasswordPage/>}/>
                         </Route>
                     </Routes>
                     <Footer/>

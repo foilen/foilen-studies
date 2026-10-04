@@ -16,14 +16,12 @@ function HomePage() {
             <div className="col col-sm-8 col-md-5 col-xl-4 col-xxl-3">
                 <div className="card">
                     <div className="card-body">
-                        <h5 className="card-title">Compte Microsoft</h5>
+                        <h5 className="card-title">Connexion</h5>
                         <p className="card-text">
-                            Vous allez devoir vous connecter à un compte Microsoft (compte pour vous connecter à
-                            votre Windows 10/11, Hotmail, Outlook, travail ou école).
-                            Cela va permettre d'obtenir seulement un identifiant unique pour conserver vos listes et
-                            statistiques.
-                            Nous n'obtiendrons pas votre nom, courriel ou toute autre information permettant de
-                            savoir qui vous êtes ou permettre de vous contacter.
+                            Vous allez devoir vous connecter avec votre courriel, soit avec un mot de passe, soit
+                            avec un code à usage unique envoyé par courriel.
+                            Votre courriel est nécessaire pour vous identifier et conserver vos listes et
+                            statistiques. Il ne sera utilisé que pour vous connecter.
                         </p>
                     </div>
                 </div>

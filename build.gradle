@@ -23,7 +23,6 @@ repositories {
 }
 
 ext {
-    set('springCloudAzureVersion', "$springCloudAzureVersion")
     springAiVersion = "$springAiVersion"
 }
 
@@ -51,8 +50,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // Login
-    implementation 'com.azure.spring:spring-cloud-azure-starter-active-directory'
-    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Text to speech
     implementation platform("com.google.cloud:libraries-bom:$googleCloudLibrariesBomVersion")
@@ -68,7 +66,6 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "com.azure.spring:spring-cloud-azure-dependencies:${springCloudAzureVersion}"
         mavenBom "org.springframework.ai:spring-ai-bom:$springAiVersion"
     }
 }

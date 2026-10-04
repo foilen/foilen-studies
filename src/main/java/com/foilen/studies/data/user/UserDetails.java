@@ -4,15 +4,22 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 @Document
 public class UserDetails {
 
     @Id
     private String id;
-    private Set<String> providerIds = new HashSet<>();
+
+    private String email;
+    private boolean disabled;
+
+    private String passwordHash;
+    private Date passwordLastChange;
+
+    private String loginCode;
+    private Date loginCodeExpiration;
+    private Date loginCodeLastGenerated;
 
     private Date creationDate;
     private Date lastLoginDate;
@@ -25,12 +32,60 @@ public class UserDetails {
         this.id = id;
     }
 
-    public Set<String> getProviderIds() {
-        return providerIds;
+    public String getEmail() {
+        return email;
     }
 
-    public void setProviderIds(Set<String> providerIds) {
-        this.providerIds = providerIds;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public Date getPasswordLastChange() {
+        return passwordLastChange;
+    }
+
+    public void setPasswordLastChange(Date passwordLastChange) {
+        this.passwordLastChange = passwordLastChange;
+    }
+
+    public String getLoginCode() {
+        return loginCode;
+    }
+
+    public void setLoginCode(String loginCode) {
+        this.loginCode = loginCode;
+    }
+
+    public Date getLoginCodeExpiration() {
+        return loginCodeExpiration;
+    }
+
+    public void setLoginCodeExpiration(Date loginCodeExpiration) {
+        this.loginCodeExpiration = loginCodeExpiration;
+    }
+
+    public Date getLoginCodeLastGenerated() {
+        return loginCodeLastGenerated;
+    }
+
+    public void setLoginCodeLastGenerated(Date loginCodeLastGenerated) {
+        this.loginCodeLastGenerated = loginCodeLastGenerated;
     }
 
     public Date getCreationDate() {
